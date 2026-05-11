@@ -51,8 +51,8 @@ class AuthController extends ApiController
             //     'password' => bcrypt(str()->random(16)),
             // ]);
             $existingUser = $this->userRepository->create([
-                'name' => $user->getName(),
-                'email' => $user->getEmail(),
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
                 'password' => bcrypt(str()->random(16)),
                 'is_guest' => false,
             ]);
