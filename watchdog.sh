@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROJECT="$(cd "$(dirname "${BASH_SOURCE[0]}")/private" && pwd)"
+PROJECT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PHP="/usr/local/php8.2/bin/php"
 LOGFILE="$PROJECT/storage/logs/queue.log"
 
