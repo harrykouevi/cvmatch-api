@@ -16,7 +16,10 @@ do
         --tries=3 \
         --timeout=90 \
         >> "$LOGFILE" 2>&1 &
+
+        echo "$(date) - Nouveau PID : $!" >> "$LOGFILE"
     else
+        PID=$(pgrep -f "artisan queue:work database")
         echo "$(date) - Worker déjà actif." >> "$LOGFILE"
     fi
 
