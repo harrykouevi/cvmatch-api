@@ -24,14 +24,14 @@ class SyncProductProviderJob implements ShouldQueue
      */
     public function handle(CreditPlanProviderFactory $factory): void
     {
-         Log::info('JOB STARTED', [
+        Log::info('JOB STARTED', [
             'provider' => $this->provider,
         ]);
 
 
         $lock = cache()->lock("sync_{$this->provider}", 300);
 
-        if (!$lock->get()) {
+        if (!$lock->block(5)) {
             return;
         }
 
@@ -49,7 +49,8 @@ class SyncProductProviderJob implements ShouldQueue
             throw $e; // IMPORTANT
 
         } finally {
-            cache()->forget("sync_{$this->provider}");
+            // cache()->forget("sync_{$this->provider}");
+            optional($lock)->release();
         }
     }
 }
