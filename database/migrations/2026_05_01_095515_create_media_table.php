@@ -15,7 +15,6 @@ return new class extends Migration
             $table->unsignedBigInteger('model_id');
             $table->index(['model_type', 'model_id']);
 
-            $table->uuid()->nullable();
 
             // avoid uuid unique index overflow
             $table->string('uuid', 125)->nullable()->unique();
