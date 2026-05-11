@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('credit_transactions', function (Blueprint $table) {
             $table->id();
 
-            $table->string('user_email')->index();
+            // $table->string('user_email')->index();
 
             $table->foreignId('payment_id')
                 ->nullable()
