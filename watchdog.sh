@@ -6,7 +6,7 @@ LOGFILE="$PROJECT/storage/logs/queue.log"
 
 echo "$(date) - Démarrage worker Laravel" >> "$LOGFILE"
 
-exec $PHP $PROJECT/artisan queue:work database \
+exec $PHP $PROJECT/artisan queue:work \
     --queue=notifications,upload \
     --sleep=3 \
     --tries=3 \
