@@ -34,8 +34,8 @@ return new class extends Migration
 
             $table->string('currency')->default('usd');
 
-            $table->string('stripe_session_id')->unique();
-            $table->string('stripe_payment_intent_id')->nullable();
+            // $table->string('stripe_session_id', 191)->unique();
+            // $table->string('stripe_payment_intent_id')->nullable();
 
             // $table->string('status')->default('pending');
 
