@@ -15,5 +15,6 @@ Schedule::call(function () {
     foreach (['gumroad'] as $provider) {
         dispatch(new \App\Jobs\SyncProductProviderJob($provider));
     }
-})->everyFiveSeconds();
-// ->everyFiveMinutes();
+})
+// ->everyFiveSeconds();
+->everyMinute();
