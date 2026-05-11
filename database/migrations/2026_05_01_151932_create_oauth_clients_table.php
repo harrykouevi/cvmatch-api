@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('oauth_clients', function (Blueprint $table) {
             $table->string('uuid', 125)->primary();
-            $table->nullableMorphs('owner');
+            // $table->nullableMorphs('owner');
+
+            $table->string('owner_type', 125)->nullable();
+            $table->unsignedBigInteger('owner_id');
+            $table->index(['owner_type', 'owner_id']);
+
             $table->string('name');
             $table->string('secret')->nullable();
             $table->string('provider')->nullable();
