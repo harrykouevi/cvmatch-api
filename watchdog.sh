@@ -10,8 +10,6 @@ if ! pgrep -f "artisan queue:work" > /dev/null; then
     echo "$(date) - Worker absent, démarrage..." >> "$LOGFILE"
 
     $PHP $PROJECT/artisan queue:work \
-        database \
-        --queue=notifications,upload \
         --sleep=3 \
         --tries=3 \
         --timeout=90 \
