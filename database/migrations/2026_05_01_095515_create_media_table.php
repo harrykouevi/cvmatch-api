@@ -11,8 +11,15 @@ return new class extends Migration
         Schema::create('media', function (Blueprint $table) {
             $table->id();
 
-            $table->morphs('model');
-            $table->uuid()->nullable()->unique();
+            $table->string('model_type', 125);
+            $table->unsignedBigInteger('model_id');
+            $table->index(['model_type', 'model_id']);
+
+            $table->uuid()->nullable();
+
+            // avoid uuid unique index overflow
+            $table->string('uuid', 125)->nullable()->unique();
+
             $table->string('collection_name');
             $table->string('name');
             $table->string('file_name');
