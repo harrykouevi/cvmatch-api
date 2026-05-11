@@ -11,7 +11,8 @@ use Spatie\Permission\Traits\HasRoles;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
-use Laravel\Passport\HasApiTokens;
+// use Laravel\Passport\HasApiTokens;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
 
 

@@ -58,10 +58,13 @@ class AuthController extends ApiController
             ]);
         }
 
+
         $token = $existingUser->createToken('api-token')->plainTextToken;
 
-        return redirect(
-            "http://localhost:3000/auth/callback?token={$token}"
-        );
+        // return redirect(
+        //     "http://localhost:3000/auth/callback?token={$token}"
+        // );
+
+        return redirect('https://www.cvmatchai.us/auth/callback?token={$token}');
     }
 }
