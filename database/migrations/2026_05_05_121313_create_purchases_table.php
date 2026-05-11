@@ -34,12 +34,15 @@ return new class extends Migration
                 ->nullOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->morphs('product');
+            // $table->morphs('product');
+            $table->string('product_type', 125)->nullable();
+            $table->unsignedBigInteger('product_id');
+            $table->index(['product_type', 'product_id']);
             $table->json('product_snapshot_json')->nullable();
 
 
             // Statut métier de l’achat
-            $table->string('status')->default('pending');
+            $table->string('status', 125)->default('pending');
             // pending | paid | cancelled | refunded
 
             // Montant côté métier (optionnel mais utile pour historique)
