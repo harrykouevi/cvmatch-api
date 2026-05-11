@@ -6,17 +6,19 @@ LOGFILE="$PROJECT/storage/logs/queue.log"
 
 while true
 do
-  if ! pgrep -f "artisan queue:work database" > /dev/null
-  then
-    echo "$(date) - Worker arrêté. Redémarrage..." >> "$LOGFILE"
+    if ! pgrep -f "artisan queue:work database" > /dev/null
+    then
+        echo "$(date) - Worker arrêté. Redémarrage..." >> "$LOGFILE"
 
-    $PHP $PROJECT/artisan queue:work database \
-      --queue=notifications,upload \
-      --sleep=3 \
-      --tries=3 \
-      --timeout=90 \
-      >> "$LOGFILE" 2>&1 &
-  fi
+        $PHP $PROJECT/artisan queue:work database \
+        --queue=notifications,upload \
+        --sleep=3 \
+        --tries=3 \
+        --timeout=90 \
+        >> "$LOGFILE" 2>&1 &
+    else
+        echo "$(date) - Worker déjà actif." >> "$LOGFILE"
+    fi
 
   sleep 60
 done
