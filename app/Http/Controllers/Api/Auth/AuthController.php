@@ -24,11 +24,6 @@ class AuthController extends ApiController
 
     public function show(Request $request): JsonResponse
     {
-
-        //     return response()->json([
-        //     'success' => true,
-        //     'data' => $request->user()
-        // ]);
         return $this->sendResponse([$request->user()], __('lang.saved_successfully', ['operator' => __('lang.resume')]));
     }
 
@@ -65,6 +60,6 @@ class AuthController extends ApiController
         //     "http://localhost:3000/auth/callback?token={$token}"
         // );
 
-        return redirect('https://www.cvmatchai.us/auth/callback?token={$token}');
+        return redirect("https://www.cvmatchai.us/auth/callback?token={$token}");
     }
 }
