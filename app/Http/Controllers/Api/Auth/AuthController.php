@@ -61,6 +61,6 @@ class AuthController extends ApiController
         // );
         $token = urlencode($token) ;
 
-        return redirect("https://www.cvmatchai.us/auth/callback?token={$token}");
+        return redirect("https://cvmatchai.us/auth/callback?token={$token}");
     }
 }
