@@ -24,7 +24,10 @@ class AuthController extends ApiController
 
     public function show(Request $request): JsonResponse
     {
-        return $this->sendResponse($request->user(), __('lang.saved_successfully', ['operator' => __('lang.resume')]));
+        $user = $request->user();
+        $user->is_guest = 0; // ou false
+        $user->save();
+        return $this->sendResponse($user, __('lang.saved_successfully', ['operator' => __('lang.resume')]));
     }
 
     public function redirectToGoogle()
