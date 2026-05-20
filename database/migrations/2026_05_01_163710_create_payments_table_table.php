@@ -28,16 +28,15 @@ return new class extends Migration
 
 
             // stripe | gumroad | paypal
-            $table->string('provider');
-            // id externe provider
-            $table->string('provider_payment_id');
+            $table->string('provider', 50);
+            $table->string('provider_payment_id', 120);
 
             $table->integer('amount');
 
             $table->string('currency')->default('usd');
 
             // pending | paid | failed | refunded
-            $table->string('status')->default('pending');
+            $table->string('status', 50)->default('pending');
             $table->json('meta_json')->nullable();
             $table->timestamp('paid_at')->nullable();
 
