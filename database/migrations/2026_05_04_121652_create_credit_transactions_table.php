@@ -14,7 +14,17 @@ return new class extends Migration
         Schema::create('credit_transactions', function (Blueprint $table) {
             $table->id();
 
-            // $table->string('user_email')->index();
+            $table->foreignId('tenant_id')
+                ->nullable()
+                ->constrained('tenants')
+                ->nullOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete()
+                ->cascadeOnUpdate();
 
             $table->foreignId('payment_id')
                 ->nullable()
@@ -28,7 +38,7 @@ return new class extends Migration
 
             $table->integer('balance_after'); // solde après transaction
 
-            $table->json('pricing_snapshot_json')->nullable();
+            $table->json('snapshot_json')->nullable();
 
             $table->string('description')->nullable();
 

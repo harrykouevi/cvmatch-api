@@ -17,29 +17,32 @@ return new class extends Migration
             $table->foreignId('tenant_id')
                 ->nullable()
                 ->constrained('tenants')
-                ->cascadeOnDelete()
-                ->cascadeOnUpdate();
-
-            $table->foreignId('analysis_id')
-                ->nullable()
-                ->constrained('analyses')
                 ->nullOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->string('user_email')->nullable();
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
 
-            // snapshot du plan (important pour historique)
-            $table->json('plan')->nullable();
+
+
+            // stripe | gumroad | paypal
+            $table->string('provider');
+            // id externe provider
+            $table->string('provider_payment_id');
+
             $table->integer('amount');
 
             $table->string('currency')->default('usd');
 
-            // $table->string('stripe_session_id', 191)->unique();
-            // $table->string('stripe_payment_intent_id')->nullable();
-
-            // $table->string('status')->default('pending');
+            // pending | paid | failed | refunded
+            $table->string('status')->default('pending');
+            $table->json('meta_json')->nullable();
+            $table->timestamp('paid_at')->nullable();
 
             $table->timestamps();
+            $table->index(['provider', 'provider_payment_id']);
         });
     }
 

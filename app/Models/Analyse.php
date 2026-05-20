@@ -31,16 +31,30 @@ class Analyse extends Model implements Transformable, HasMedia
      */
     protected $fillable = [
         "resume_id",
+        "user_id",
         "job_description",
         "status",
+        "is_full_unlocked",
+
+
         "score",
+        "match_level",
+        "job_fit_summary",
         "score_breakdown_json" ,
-        "critical_problems_json",
         "missing_keywords_json",
-        "is_paid",
-        "ats_issues_json",
+        "missing_hard_skills_json",
+        "weak_sections_json",
+        "strong_points_json",
+        "detected_problems_json",
+        "recruiter_risk_flags_json",
+        "recommendations_json",
+        "warnings_json",
+
         "optimized_resume",
-        "cover_letter"
+        "optimized_resume_text",
+        "cover_letter",
+        "optimized_resume_analysis_json"
+
     ];
 
 
@@ -56,19 +70,38 @@ class Analyse extends Model implements Transformable, HasMedia
 
     protected $casts = [
         'score_breakdown_json' => 'array',
-        'critical_problems_json' => 'array',
         'missing_keywords_json' => 'array',
-        'ats_issues_json' => 'array',
+        'missing_hard_skills_json' => 'array',
+        "weak_sections_json" => 'array',
+        "strong_points_json" => 'array',
+        "detected_problems_json" => 'array',
+        "recruiter_risk_flags_json" => 'array',
+        "recommendations_json" => 'array',
+        "warnings_json" => 'array',
+        "optimized_resume_analysis_json" => 'array',
     ];
 
     public function setScoreBreakdownAttribute($value)    {$this->attributes['score_breakdown_json'] = json_encode($value);}
-    public function setCriticalProblemsAttribute($value)    {$this->attributes['critical_problems_json'] = json_encode($value);}
     public function setMissingKeywordsAttribute($value)    {$this->attributes['missing_keywords_json'] = json_encode($value);}
-    public function setAtsIssuesAttribute($value)    {$this->attributes['ats_issues_json'] = json_encode($value);}
+    public function setMissingHardSkillsAttribute($value)    {$this->attributes['missing_hard_skills_json'] = json_encode($value);}
+    public function setWeakSectionsAttribute($value)    {$this->attributes['weak_sections_json'] = json_encode($value);}
+    public function setStrongPointsAttribute($value)    {$this->attributes['strong_points_json'] = json_encode($value);}
+    public function setDetectedProblemsAttribute($value)    {$this->attributes['detected_problems_json'] = json_encode($value);}
+    public function setRecruiterRiskFlagsAttribute($value)    {$this->attributes['recruiter_risk_flags_json'] = json_encode($value);}
+    public function setRecommendationsAttribute($value)    {$this->attributes['recommendations_json'] = json_encode($value);}
+    public function setWarningsAttribute($value)    {$this->attributes['warnings_json'] = json_encode($value);}
+    public function setOptimizedResumeAnalysisAttribute($value)    {$this->attributes['optimized_resume_analysis_json'] = json_encode($value);}
+
     public function getScoreBreakdownAttribute()    {return $this->score_breakdown_json;}
-    public function getCriticalProblemsAttribute()    {return $this->critical_problems_json;}
     public function getMissingKeywordsAttribute()    {return $this->missing_keywords_json;}
-    public function getAtsIssuesAttribute()    {return $this->ats_issues_json;}
+    public function getMissingHardSkillsAttribute()    {return $this->missing_hard_skills_json;}
+    public function getWeakSectionsAttribute()    {return $this->weak_sections_json;}
+    public function getStrongPointsAttribute()    {return $this->strong_points_json;}
+    public function getDetectedProblemsAttribute()    {return $this->detected_problems_json;}
+    public function getRecruiterRiskFlagsAttribute()    {return $this->recruiter_risk_flags_json;}
+    public function getRecommendationsAttribute()    {return $this->recommendations_json;}
+    public function getWarningsAttribute()    {return $this->warnings_json;}
+    public function getOptimizedResumeAnalysisAttribute()    {return $this->optimized_resume_analysis_json;}
 
 
 

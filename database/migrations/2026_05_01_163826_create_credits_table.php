@@ -17,18 +17,21 @@ return new class extends Migration
             $table->foreignId('tenant_id')
                 ->nullable()
                 ->constrained('tenants')
-                ->cascadeOnDelete()
-                ->cascadeOnUpdate();
-
-            $table->string('user_email');
-
-            $table->integer('remaining_credits')->default(0);
-
-            $table->foreignId('source_payment_id')
-                ->nullable()
-                ->constrained('payments')
                 ->nullOnDelete()
                 ->cascadeOnUpdate();
+
+            // L’utilisateur qui achète
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->integer('balance')->default(0);
+            $table->integer('used')->default(0);
+            $table->integer('purchased_total')->default(0);
+
+
 
             $table->timestamps();
         });

@@ -34,9 +34,13 @@ return [
         'X-Requested-With',
         'Accept',
         'Origin',
+        'X-Guest-Token',
     ],
 
-    'exposed_headers' => [],
+    'exposed_headers' =>
+    [
+        'X-Guest-Token',
+    ],
 
     'max_age' => 0,
 

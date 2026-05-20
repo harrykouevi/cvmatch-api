@@ -14,7 +14,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @package namespace App\Entities;
  *
  */
-class Payment extends Model implements Transformable
+class Purchase extends Model implements Transformable
 {
 
     use TransformableTrait;
@@ -25,20 +25,22 @@ class Payment extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'provider',
-        'provider_payment_id',
-        'user_id',
+
+        'user_id' ,
+        'payment_id',
+        'product_type' ,
+        'product_id' ,
+        'status',
         'amount',
         'currency',
-        'status',
-        'paid_at',
-        'meta_json',
+        'product_snapshot_json' ,
+        'purchased_at',
     ];
-
 
     protected $casts = [
-        'meta_json' => 'array',
+        'product_snapshot_json' => 'array',
     ];
+
 
 
      /**

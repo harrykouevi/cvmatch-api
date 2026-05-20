@@ -10,6 +10,140 @@ class OpenAIResumeService
     private Client $client;
     private string $apiKey;
     private string $model;
+    private string $fakeResume = "KOUEVI Harry Ayigan
+        Ingénieur Backend & Systèmes | Administrateur Linux | Gestion de Projets IT
+        📍 Lomé, Togo | 📞 +22890365486 | harry.kouevi@gmail.com
+
+        PROFIL PROFESSIONNEL
+        Ingénieur Backend & Systèmes avec plus de 10 ans d’expérience dans la conception, le développement, le déploiement et la supervision de solutions informatiques.
+
+        Je possède une double expertise en développement logiciel et en administration systèmes, me permettant d’intervenir sur l’ensemble du cycle de vie des projets IT : architecture technique, développement, mise en production, supervision, maintenance et optimisation des performances.
+
+        Expérimenté dans la gestion de projets digitaux, l’encadrement d’équipes techniques et l’administration d’environnements Linux, je contribue à garantir la disponibilité, la sécurité et la stabilité des systèmes d’information.
+
+        Rigoureux, organisé et orienté résultats, je souhaite mettre mes compétences techniques et organisationnelles au service d’un environnement exigeant, où les enjeux de performance, de sécurité et de continuité des services sont critiques.
+
+        COMPÉTENCES TECHNIQUES
+
+        Backend & Développement
+        ● PHP (Laravel), JavaScript, Node.js
+        ● Conception et développement d’APIs REST
+        ● Architecture backend scalable
+        ● Intégration d’applications web et services
+
+        Frontend
+        ● AngularJS, Vue.js, HTML5, Bootstrap
+
+        DevOps & Administration Systèmes
+        ● Administration Linux (Ubuntu, CentOS)
+        ● Déploiement et maintenance d’applications sur serveurs (VPS, dédiés)
+        ● Docker (containerisation)
+        ● Bash scripting
+        ● Monitoring et supervision des systèmes
+        ● Notions de virtualisation (VMware, VirtualBox)
+        ● Notions de Windows Server
+
+        Base de données
+        ● MySQL (modélisation, optimisation des performances)
+        ● Notions de PostgreSQL
+        ● Gestion et supervision de bases de données
+
+        Réseaux
+        ● Configuration DNS, DHCP, routing
+        ● Notions en cybersécurité
+        ● Notions en sécurité réseau (firewall, VPN)
+
+        Gestion de projets & Outils
+        ● Gestion de projets Agile / Scrum
+        ● Coordination d’équipes techniques
+        ● Git
+
+        EXPÉRIENCE PROFESSIONNELLE
+
+        Développeur Chef de projet
+        Business Help Consulting, LOMÉ-TOGO, Région Maritime
+        Décembre 2024 - Présent
+        ● Pilotage de projets digitaux en méthodologie Agile (Scrum)
+        ● Coordination et encadrement d’équipe technique
+        ● Conception et développement d’une plateforme de prise de rendez-vous
+        ● Développement et intégration d’APIs REST avec application mobile (Flutter)
+        ● Déploiement et maintenance des applications sur serveurs Linux
+        ● Gestion des mises en production et suivi des déploiements
+        ● Optimisation des performances et amélioration de la disponibilité des services
+        ● Surveillance des serveurs et résolution des incidents techniques
+        ● Mise en production et suivi des déploiements applicatifs
+        ● Résolution des incidents techniques et maintenance corrective
+
+        Consultant Développeur Backend
+        LIKSOFT, LOMÉ-TOGO, Région Maritime
+        Octobre 2020 – Octobre 2024
+        ● Pilotage de projets digitaux en méthodologie Agile (Scrum)
+        ● Conception d’architectures backend robustes et scalables
+        ● Développement d’applications métiers (RH, facturation, gestion de prêts)
+        ● Création d’APIs REST sécurisées et performantes
+        ● Déploiement d’applications avec Docker sur environnements Linux
+        ● Contribution à la haute disponibilité des systèmes et services en production
+        ● Intégration avec interfaces (AngularJS)
+        ● Optimisation des performances des bases de données MySQL
+        ● Maintenance évolutive et corrective des applications
+
+        Administrateur de Base de Données
+        Commission Électorale Nationale Indépendante, Togo
+        2019 – 2024
+        ● Garantie de l’intégrité, sécurité et disponibilité des données
+        ● Optimisation des performances des systèmes
+        ● Support aux opérations électorales critiques
+
+        Freelance sur l'application web FOCUSAFRIK.COM
+        Force One, LOMÉ-TOGO, Région Maritime
+        Septembre 2017 – Mai 2019
+        ● Conception et mise en œuvre d'une structure de données robuste, optimisée pour répondre aux besoins variés de la plateforme, garantissant une gestion efficace des informations.
+        ● Gestion des menus et rubriques, assurant une navigation fluide et intuitive pour les utilisateurs, ce qui a amélioré l'expérience globale sur le site.
+        ● Gestion des comptes utilisateurs, y compris les comptes administrateurs, articles, forums de discussion, ainsi que la gestion des annonceurs publicitaires et des publicités, permettant un contrôle rigoureux du contenu et des interactions.
+        ● Optimisation des processus backend, contribuant à la performance et à la scalabilité de l'application, afin de s'adapter aux fluctuations de la demande utilisateur sans compromettre la qualité du service.
+
+        Développeur Full Stack
+        KEOGRAPHIX, LOMÉ-TOGO, Région Maritime
+        Septembre 2016 – Septembre 2017
+        ● Responsable du développement d'un logiciel de gestion de portefeuille, optimisant la gestion des inventaires pour les utilisateurs.
+        ● Implémentation de solutions backend robustes : Développement en JavaScript et Laravel, ce qui a permis de réduire le temps de traitement des données.
+        ● Contribution aux phases d'analyse et de conception : Participation active dans le cycle de vie du développement logiciel, à savoir l'analyse, la conception et le déploiement.
+        ● Maintenance et mise à jour des applications web, assurant leur bon fonctionnement et intégrant de nouvelles fonctionnalités en réponse aux besoins des utilisateurs.
+
+        Stagiaire Développeur Full Stack
+        SUNU Assurances IARD-TOGO, LOMÉ-TOGO, Région Maritime
+        2015 – 2016
+        ● Développement d’applications internes (assurance, infirmerie)
+        ● Utilisation de Laravel et MySQL
+        ● Participation au cycle complet de développement
+
+        FORMATION
+
+        Licence en Informatique – Niveau Bac+3
+        IAEC, LOMÉ-TOGO, Région Maritime
+        Année académique : 2023 – 2024
+
+        Brevet de technicien Supérieur en Informatique
+        IAEC, LOMÉ-TOGO, Région Maritime
+        Année d'obtention : 2013
+
+        Baccalauréat série D
+        Lycée Général d’Adidogomé, LOMÉ-TOGO, Région Maritime
+        Année d'obtention : 2010
+
+        LANGUES
+        ● Français : Courant
+        ● Anglais : Niveau technique et professionnel
+
+        QUALITÉS PROFESSIONNELLES
+        ● Sens de l’organisation et rigueur
+        ● Capacité d’analyse et de synthèse
+        ● Gestion du stress et des priorités
+        ● Bon relationnel et esprit d’équipe
+        ● Capacité d’adaptation
+        ● Sens des responsabilités
+        ● Discrétion et professionnalisme
+        ● Esprit d’initiative et autonomie" ;
 
     public function __construct()
     {
@@ -26,30 +160,36 @@ class OpenAIResumeService
     {
         $prompt = $this->buildPrompt($resumeText, $jobDescription);
         try {
-            $response = $this->client->post('responses', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->apiKey,
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'model' => $this->model,
-                    'input' => $prompt,
-                    'text' => [
-                        'format' => [
-                            'type' => 'json_object'
+            Log::info(["nnnnnnnnn", env('SIMULATE_AI',false)]);
+            if(env('SIMULATE_AI',false) == false){
+                $response = $this->client->post('responses', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->apiKey,
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'model' => $this->model,
+                        'input' => $prompt,
+                        'text' => [
+                            'format' => [
+                                'type' => 'json_object'
+                            ]
                         ]
-                    ]
-                ],
-            ]);
+                    ],
+                ]);
 
-            $data = json_decode($response->getBody()->getContents(), true);
-            $output = $data['output'][1]['content'][0]['text'] ?? null;
+                $data = json_decode($response->getBody()->getContents(), true);
+                $output = $data['output'][1]['content'][0]['text'] ?? null;
 
-            if (!$output) {
-                return [
-                    'success' => false,
-                    'message' => 'No response from OpenAI',
-                ];
+                if (!$output) {
+                    return [
+                        'success' => false,
+                        'message' => 'No response from OpenAI',
+                    ];
+                }
+            }else{
+                $data = ["original_resume"=>["overall_ats_score"=>43,"match_level"=>"Weak","job_fit_summary"=>"The resume shows strong backend, Linux administration, REST API, Docker, MySQL, Agile/Scrum, and IT project coordination experience. However, the provided job description does not contain meaningful role requirements, technologies, responsibilities, or qualifications, so a reliable job-specific ATS match cannot be established. The original resume is also written in French, includes some non-ATS-friendly symbols, has a long summary, duplicate bullets, limited metrics, and overlapping employment dates that may require clarification for a US recruiter.","scoring_breakdown"=>["keyword_match"=>0,"skills_alignment"=>50,"experience_relevance"=>52,"resume_structure"=>54,"ats_readability"=>47,"achievement_quality"=>38],"missing_keywords"=>["No meaningful job-specific keywords could be extracted from the provided job description","Job title not identifiable","Required technologies not identifiable","Required responsibilities not identifiable","Required qualifications not identifiable"],"missing_hard_skills"=>["Unable to determine missing hard skills because the job description is not usable","No clear required programming languages listed","No clear infrastructure or DevOps requirements listed","No clear database requirements listed","No clear cloud or security requirements listed"],"weak_sections"=>["Professional summary is long and paragraph-heavy","Experience bullets are mostly responsibility-based rather than achievement-based","Several accomplishments lack measurable impact","Duplicate bullets appear in the current role","Resume is in French, which may reduce parsing and recruiter readability for US-based roles","Qualities section is generic and less valuable than technical achievements"],"strong_points"=>["More than 10 years of IT, backend development, and systems experience","Relevant backend stack including PHP, Laravel, JavaScript, Node.js, REST APIs, and MySQL","Linux administration, Docker deployment, server monitoring, and production support experience","Agile/Scrum project coordination and technical team leadership experience","Experience supporting production systems and critical data operations"],"detected_problems"=>["Provided job description appears invalid or nonsensical, preventing true ATS keyword matching","Use of icons and special characters in contact section may reduce ATS readability","Long professional profile may be skimmed by recruiters","Repeated deployment and incident-resolution bullets in the Business Help Consulting role","Concurrent roles from 2020 to 2024 and 2019 to 2024 may raise questions if not explained","Education naming and degree equivalency may need US-style clarification"],"recruiter_risk_flags"=>["Job fit cannot be validated because the job description is not meaningful","Overlapping employment dates between LIKSOFT and the Commission Electorale Nationale Independente may require clarification","Limited quantified results make impact harder to assess","Resume language may not match US recruiter expectations if applying to English-language roles"]],"optimized_resume_analysis"=>["overall_ats_score"=>58,"score_improvement"=>15,"scoring_breakdown"=>["keyword_match"=>0,"skills_alignment"=>60,"experience_relevance"=>60,"resume_structure"=>82,"ats_readability"=>86,"achievement_quality"=>58],"improvements_made"=>["Converted the resume into a US-style English format with clear section headings","Removed icons, duplicate bullets, and generic soft-skill lists","Condensed the professional summary into a recruiter-friendly profile","Reorganized technical skills into ATS-readable categories","Rewrote experience bullets with stronger action verbs and clearer technical context","Improved emphasis on backend engineering, REST APIs, Linux administration, Docker, MySQL, production support, monitoring, and Agile/Scrum","Preserved all real companies, dates, education, and technologies without inventing certifications or fake metrics"],"keywords_added"=>["Backend Engineer","Systems Engineer","Linux Administration","REST APIs","API Integration","Laravel","PHP","Node.js","JavaScript","Docker","MySQL","Database Administration","Production Deployment","Monitoring","Incident Resolution","Agile","Scrum","Technical Team Coordination","Performance Optimization","High Availability"],"recruiter_impression"=>"The optimized resume is significantly easier for a US recruiter and ATS to parse. It presents the candidate as a senior backend and systems professional with practical production, Linux, database, API, and project leadership experience. However, because the job description is invalid and contains no usable requirements, the resume cannot score as a strong or excellent match for this specific posting.","remaining_weaknesses"=>["True job-specific keyword alignment cannot be improved without a valid job description","Most achievements still lack measurable outcomes such as uptime improvement, latency reduction, number of users, team size, or deployment frequency","Overlapping employment dates should be explained as consulting, contract, part-time, or concurrent engagements if applicable","No certifications are listed","Cloud platform experience such as AWS, Azure, or GCP is not clearly demonstrated"]],"optimized_resume"=>"HARRY AYIGAN KOUEVI","optimized_resume_array"=>["full_name"=>"Harry Ayigan Kouevi","headline"=>"Backend & Systems Engineer | Linux Administrator | IT Project Lead","professional_summary"=>"Backend and Systems Engineer with 10+ years of experience designing, developing, deploying, monitoring, and maintaining web applications and IT systems. Strong background in PHP, Laravel, JavaScript, Node.js, REST API development, MySQL, Linux administration, Docker deployments, and production support. Experienced in Agile/Scrum project coordination, technical team leadership, database administration, system monitoring, incident resolution, and performance optimization for business-critical applications.","skills"=>["PHP","Laravel","JavaScript","Node.js","REST API development","API integration","Scalable backend architecture","AngularJS","Vue.js","HTML5","Bootstrap","Linux administration","Ubuntu","CentOS","Docker","Bash scripting","VPS deployment","Dedicated server deployment","System monitoring","Production support","Incident resolution","MySQL","Database modeling","Database performance optimization","Database administration","PostgreSQL fundamentals","DNS","DHCP","Routing","Firewall fundamentals","VPN fundamentals","Network security fundamentals","Cybersecurity fundamentals","Agile","Scrum","Technical team coordination","Git","VMware fundamentals","VirtualBox","Windows Server fundamentals"],"professional_experience"=>[["company"=>"Business Help Consulting","location"=>"Lome, Togo","title"=>"Developer / Project Lead","dates"=>"December 2024 - Present","bullets"=>["Lead digital projects using Agile/Scrum practices, coordinating technical delivery and team execution.","Design and develop a web-based appointment scheduling platform to support business workflows.","Build and integrate REST APIs with a Flutter mobile application.","Deploy, maintain, and support applications on Linux servers in production environments.","Manage production releases, deployment follow-up, and post-deployment support.","Monitor servers, troubleshoot technical incidents, and support service availability.","Improve application performance and system reliability through backend and infrastructure optimization."]],["company"=>"LIKSOFT","location"=>"Lome, Togo","title"=>"Backend Developer Consultant","dates"=>"October 2020 - October 2024","bullets"=>["Designed robust and scalable backend architectures for business applications.","Developed applications for HR management, billing, and loan management use cases.","Built secure and performance-focused REST APIs for internal and client-facing systems.","Deployed applications with Docker on Linux environments.","Supported high availability for production systems and services.","Integrated backend services with AngularJS user interfaces.","Optimized MySQL database performance and supported ongoing database maintenance.","Delivered corrective and evolutionary maintenance for production applications."]],["company"=>"Commission Electorale Nationale Independente","location"=>"Togo","title"=>"Database Administrator","dates"=>"2019 - 2024","bullets"=>["Administered databases supporting critical electoral operations.","Helped ensure data integrity, security, and availability across operational systems.","Optimized system and database performance to support time-sensitive election workflows.","Provided technical support for critical data operations and production issues."]],["company"=>"Force One","location"=>"Lome, Togo","title"=>"Freelance Web Developer, FOCUSAFRIK.COM","dates"=>"September 2017 - May 2019","bullets"=>["Designed and implemented a structured data model to support content, users, forums, advertisers, and advertisements.","Managed menus, content categories, user accounts, administrator accounts, and platform content workflows.","Improved backend processes to support application performance, scalability, and user experience.","Supported site administration features and content management capabilities for the web platform."]],["company"=>"KEOGRAPHIX","location"=>"Lome, Togo","title"=>"Full Stack Developer","dates"=>"September 2016 - September 2017","bullets"=>["Developed a portfolio management application to support inventory and operational tracking.","Built backend functionality using Laravel and JavaScript.","Participated in analysis, design, development, deployment, and maintenance phases of the software development life cycle.","Maintained and updated web applications based on user needs and new feature requirements."]],["company"=>"SUNU Assurances IARD-Togo","location"=>"Lome, Togo","title"=>"Full Stack Developer Intern","dates"=>"2015 - 2016","bullets"=>["Developed internal applications for insurance and infirmary-related workflows.","Used Laravel and MySQL to build and maintain application features.","Participated in the full software development cycle, including analysis, development, testing, and deployment support."]]],"education"=>[["degree"=>"Bachelor-level Degree in Computer Science, Bac+3 Level","institution"=>"IAEC","location"=>"Lome, Togo","date"=>"Academic Year: 2023 - 2024"],["degree"=>"Higher Technician Certificate in Computer Science","institution"=>"IAEC","location"=>"Lome, Togo","date"=>"2013"],["degree"=>"Baccalaureate, Series D","institution"=>"Lycee General d'Adidogome","location"=>"Lome, Togo","date"=>"2010"]],"certifications"=>[],"projects"=>[["name"=>"Appointment Scheduling Platform","organization"=>"Business Help Consulting","description"=>"Designed and developed a web platform with REST API integration for a Flutter mobile application and Linux server deployment."],["name"=>"Business Applications for HR, Billing, and Loan Management","organization"=>"LIKSOFT","description"=>"Developed backend services, REST APIs, MySQL database functionality, and production support for business applications."],["name"=>"FOCUSAFRIK.COM","organization"=>"Force One","description"=>"Supported data structure, user management, content workflows, forums, advertisers, advertisements, and backend performance improvements."]],"languages"=>["French: Fluent","English: Technical and professional working proficiency"]],"cover_letter"=>"Dear Hiring Team,I am writing to express my interest in a backend engineering, systems engineering, or IT project role aligned with my experience in software development, Linux administration, database administration, and production support. I bring more than 10 years of experience designing, developing, deploying, monitoring, and maintaining web applications and business-critical IT systems.My background includes PHP, Laravel, JavaScript, Node.js, REST API development, MySQL, Docker, Linux server administration, system monitoring, incident resolution, and Agile/Scrum project coordination. In recent roles, I have led digital projects, coordinated technical teams, developed backend platforms, integrated APIs with mobile applications, deployed applications on Linux environments, and supported production availability and performance.I would welcome the opportunity to contribute my backend development, systems administration, and project coordination experience to your technical team. Thank you for your time and consideration.Sincerely,Harry Ayigan Kouevi","recommendations"=>["Provide a valid job description before final tailoring; the current job description is not usable for accurate ATS matching.","Add measurable results where accurate, such as number of applications supported, team size, uptime, number of APIs, users served, deployment frequency, database size, or performance improvements.","Clarify whether the Commission Electorale Nationale Independente role was part-time, contract, consulting, or concurrent with LIKSOFT.","If applying to US or English-language roles, use the English optimized version and avoid icons, photos, tables, and heavy formatting.","Add a LinkedIn URL or GitHub/portfolio link if available and professionally maintained.","Consider adding relevant certifications only if actually earned, such as Linux, Docker, Scrum, cloud, or database certifications."],"warnings"=>["The job description appears to be invalid text, so the ATS score cannot represent a true role-specific match.","No fake skills, certifications, companies, degrees, or quantified metrics were added.","The optimized score remains conservative because job-specific requirements are unavailable.","Overlapping employment dates may trigger recruiter questions unless explained clearly."]];
+                $output = json_encode($data);
             }
 
             return [
@@ -73,30 +213,37 @@ class OpenAIResumeService
     {
         $prompt = $this->buildCleanTextPrompt($resumeText);
         try {
-            $response = $this->client->post('responses', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->apiKey,
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'model' => $this->model,
-                    'input' => $prompt,
-                    'text' => [
-                        'format' => [
-                            'type' => 'json_object'
+             Log::info(["cleann nnnnnnnnn", env('SIMULATE_AI',false)]);
+            if(env('SIMULATE_AI',false) == false){
+                $response = $this->client->post('responses', [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->apiKey,
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'model' => $this->model,
+                        'input' => $prompt,
+                        'text' => [
+                            'format' => [
+                                'type' => 'json_object'
+                            ]
                         ]
-                    ]
-                ],
-            ]);
+                    ],
+                ]);
 
-            $data = json_decode($response->getBody()->getContents(), true);
-            $output = $data['output'][1]['content'][0]['text'] ?? null;
+                $data = json_decode($response->getBody()->getContents(), true);
+                $output = $data['output'][1]['content'][0]['text'] ?? null;
 
-            if (!$output) {
-                return [
-                    'success' => false,
-                    'message' => 'No response from OpenAI',
-                ];
+                if (!$output) {
+                    return [
+                        'success' => false,
+                        'message' => 'No response from OpenAI',
+                    ];
+                }
+            }else{
+
+                $data = ["text_clean" => $this->fakeResume ];
+                $output = json_encode($data);
             }
 
             return [
@@ -119,28 +266,74 @@ class OpenAIResumeService
     private function buildPrompt(string $resumeText, string $jobDescription): string
     {
         return <<<PROMPT
-            You are an expert US resume strategist and ATS optimization specialist.
+            You are an elite US ATS resume analyst, recruiter simulation engine, and resume optimization specialist.
 
-            Analyze the candidate resume against the job description.
+            Your task is to:
+                1. Analyze the ORIGINAL resume against the job description
+                2. Simulate a realistic ATS evaluation
+                3. Generate an ATS-optimized US-style resume
+                4. Re-evaluate the OPTIMIZED resume against the same job description
+                5. Return realistic BEFORE and AFTER scoring based on actual improvements
+
+            IMPORTANT:
+                * Scores MUST reflect real differences between the original and optimized resume
+                * Do NOT invent random score increases
+                * The optimized score must be justified by actual keyword alignment, structure improvements, readability, and relevance
+                * Simulate a modern ATS + recruiter evaluation used in US hiring systems
 
             Return ONLY valid JSON. No markdown. No explanations.
 
             Use this exact structure:
 
             {
-            "ats_score": 0,
-            "match_level": "",
-            "job_fit_summary": "",
-            "missing_keywords": [],
-            "weak_sections": [],
-            "strong_points": [],
-            "optimized_resume": {
+
+            "original_resume": {
+                "overall_ats_score": 0,
+                "match_level": "",
+                "job_fit_summary": "",
+                "scoring_breakdown": {
+                    "keyword_match": 0,
+                    "skills_alignment": 0,
+                    "experience_relevance": 0,
+                    "resume_structure": 0,
+                    "ats_readability": 0,
+                    "achievement_quality": 0
+                },
+                "missing_keywords": [],
+                "missing_hard_skills": [],
+                "weak_sections": [],
+                "strong_points": [],
+                "detected_problems": [],
+                "recruiter_risk_flags": []
+            },
+
+            "optimized_resume_analysis": {
+                "overall_ats_score": 0,
+                "score_improvement": 0,
+                "scoring_breakdown": {
+                    "keyword_match": 0,
+                    "skills_alignment": 0,
+                    "experience_relevance": 0,
+                    "resume_structure": 0,
+                    "ats_readability": 0,
+                    "achievement_quality": 0
+                },
+                "improvements_made": [],
+                "keywords_added": [],
+                "recruiter_impression": "",
+                "remaining_weaknesses": []
+            }
+
+            "optimized_resume": "",
+            "optimized_resume_array": {
                 "full_name": "",
                 "headline": "",
                 "professional_summary": "",
                 "skills": [],
                 "professional_experience": [],
                 "education": [],
+                "certifications": [],
+                "projects": [],
                 "languages": []
             },
             "cover_letter": "",
@@ -148,10 +341,61 @@ class OpenAIResumeService
             "warnings": []
             }
 
+
+            Scoring Rules:
+            - Scores must be realistic and conservative
+
+            - ATS score ranges:
+                0-39 = Poor
+                40-59 = Weak
+                60-74 = Average
+                75-84 = Strong
+                85-100 = Excellent
+
+            - Base scoring on:
+                * keyword overlap with job description
+                * relevance of experience
+                * measurable achievements
+                * ATS readability
+                * formatting clarity
+                * role alignment
+                * skill matching
+                * action verbs
+                * recruiter readability
+
+            - Penalize:
+                * missing keywords
+                * keyword stuffing
+                * vague summaries
+                * generic bullet points
+                * weak metrics
+                * irrelevant experience
+                * poor structure
+                * repeated skills
+                * long paragraphs
+
             Rules:
-            - Do NOT invent fake experience
-            - Use US resume standards
-            - Keep output realistic
+            - Do NOT invent fake experience, fake companies, fake degrees or fake certifications
+            - Improve wording using realistic US recruiter standards
+            - Use ATS-friendly formatting
+            - Add missing keywords ONLY when logically supported by the candidate’s real experience
+            - Preserve chronological consistency
+            - Rewrite bullet points to sound achievement-oriented
+            - Use concise bullet points focused on achievements and responsibilities
+            - Keep resume concise and recruiter-friendly
+            - Use strong action verbs
+            - Avoid duplicated skills
+            - Prioritize measurable impact where possible
+            - Ensure the output can be directly used in Laravel without additional cleanup
+
+            JSON Rules:
+            - Keep all arrays valid JSON arrays
+            - Return ONLY valid UTF-8 JSON
+            - Escape all special JSON characters correctly
+            - Keep arrays as valid JSON arrays
+            - No markdown
+            - No extra text before or after JSON
+            - Output must be directly parsable in Laravel
 
             Resume:
             $resumeText

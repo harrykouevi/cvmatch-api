@@ -24,7 +24,7 @@ return new class extends Migration
              $table->foreignId('tenant_id')
                 ->nullable()
                 ->constrained('tenants')
-                ->cascadeOnDelete()
+                ->nullOnDelete()
                 ->cascadeOnUpdate();
 
             // Lien vers le paiement réel (Stripe)
@@ -35,25 +35,25 @@ return new class extends Migration
                 ->cascadeOnUpdate();
 
             // $table->morphs('product');
-            $table->string('product_type', 125)->nullable();
+            $table->string('product_type', 125);
             $table->unsignedBigInteger('product_id');
-            $table->index(['product_type', 'product_id']);
             $table->json('product_snapshot_json')->nullable();
 
-
-            // Statut métier de l’achat
+            // pending | paid | refunded
             $table->string('status', 125)->default('pending');
-            // pending | paid | cancelled | refunded
+
 
             // Montant côté métier (optionnel mais utile pour historique)
-            $table->integer('amount')->nullable();
+            $table->integer('amount');
             $table->string('currency', 10)->default('usd');
+            $table->timestamp('purchased_at');
 
             $table->timestamps();
 
             // Index utiles
             $table->index(['user_id', 'status']);
             $table->index('payment_id');
+            $table->index(['product_type', 'product_id']);
         });
     }
 

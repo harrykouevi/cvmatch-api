@@ -15,12 +15,14 @@ use App\Repositories\Interfaces\CreditTransactionRepository;
 use App\Repositories\Interfaces\EventRepository;
 use App\Repositories\Interfaces\MobileWaitRepository;
 use App\Repositories\Interfaces\PaymentRepository;
+use App\Repositories\Interfaces\PurchaseRepository;
 use App\Repositories\Interfaces\ResumeRepository;
 use App\Repositories\Interfaces\ReviewRepository;
 use App\Repositories\Interfaces\UploadRepository;
 use App\Repositories\Interfaces\UserRepository;
 use App\Repositories\MobileWaitRepositoryEloquent;
 use App\Repositories\PaymentRepositoryEloquent;
+use App\Repositories\PurchaseRepositoryEloquent;
 use App\Repositories\ResumeRepositoryEloquent;
 use App\Repositories\ReviewRepositoryEloquent;
 use App\Repositories\UploadRepositoryEloquent;
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind( UserRepository::class, UserRepositoryEloquent::class);
+        $this->app->bind( PurchaseRepository::class, PurchaseRepositoryEloquent::class);
         $this->app->bind( ResumeRepository::class, ResumeRepositoryEloquent::class);
         $this->app->bind( AnalyseRepository::class, AnalyseRepositoryEloquent::class);
         $this->app->bind( EventRepository::class, EventRepositoryEloquent::class);

@@ -47,14 +47,8 @@ class Resume extends Model implements Transformable, HasMedia
      */
     public static array $rules = [
         'name' => 'required|max:127',
-        // 'salon_level_id' => 'required|exists:salon_levels,id',
-        'user_id' => 'required|exists:users,id',
-        'phone_number' => 'required|max:50',
-        'mobile_number' => 'required|max:50',
-        'availability_range' => 'numeric|max:9999999.99|min:0.01',
-        'available' => 'boolean',
-        'featured' => 'boolean',
-        'accepted' => 'required|boolean',
+        // 'user_id' => 'required|exists:users,id',
+
     ];
 
 

@@ -32,7 +32,7 @@ class AnalyseControllerTest extends TestCase
 
             // ]);
 
-            $resume = Resume::where('id',7 )->first()  ;
+            $resume = Resume::where('id',1 )->first()  ;
 
 
 
@@ -80,7 +80,7 @@ class AnalyseControllerTest extends TestCase
             // Créer un utilisateur et se connecter
             $user = $this->createUser(2);
 
-            $response = $this->actingAs($user, 'api')->getJson(route('analyses.show',1));
+            $response = $this->actingAs($user, 'api')->getJson(route('analyses.show',5));
 
             dd($response->json());
             $response->assertStatus(200);

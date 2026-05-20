@@ -17,11 +17,11 @@ use Illuminate\Validation\ValidationException;
 class MobileWaitlistController extends Controller
 {
      /** @var MobileWaitRepository */
-    private MobileWaitRepository $eventRepository;
+    private MobileWaitRepository $mobileWaitRepository;
 
-    public function __construct(MobileWaitRepository $eventRepository )
+    public function __construct(MobileWaitRepository $mobileWaitRepository )
     {
-        $this->eventRepository = $eventRepository;
+        $this->mobileWaitRepository = $mobileWaitRepository;
         parent::__construct();
     }
 
@@ -30,7 +30,7 @@ class MobileWaitlistController extends Controller
         try {
             $this->validate($request, MobileWait::$rules   );
             $input = $request->all();
-            $event = $this->eventRepository->create($input);
+            $event = $this->mobileWaitRepository->create($input);
 
         } catch (ValidationException $e) {
             return $this->sendError(array_values($e->errors()), 422);

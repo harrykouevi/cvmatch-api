@@ -23,30 +23,41 @@ class CreditTransaction extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'user_email' ,
-        'payment_id' ,
-        'type' ,
+        'tenant_id',
+        'user_id',
+        'payment_id',
+        'type',
         'credits',
         'balance_after',
-        'pricing_snapshot_json',
-        'description'
-    ];
-
-
-     /**
-     * Validation rules
-     *
-     * @var array
-     */
-    public static array $rules = [
-        'user_email' => 'required|email',
-        'payment_id' => 'required|exists:payments,id',
-        'type' => 'string' ,
-        'credits' => 'required|integer|min:1|max:9999999',
-        'pricing_snapshot_json' => 'required|string|max:255',
-        'description' => 'string',
+        'snapshot_json',
+        'description',
 
     ];
 
+
+    protected $casts = [
+        'snapshot_json' => 'array',
+    ];
+
+     /*
+    |--------------------------------------------------------------------------
+    | Relations
+    |--------------------------------------------------------------------------
+    */
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function payment()
+    {
+        return $this->belongsTo(Payment::class);
+    }
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 
 }

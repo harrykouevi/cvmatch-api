@@ -39,6 +39,8 @@ class User extends Authenticatable implements HasMedia
         'name',
         'email',
         'password',
+        'is_guest',
+        'guest_token'
     ];
 
      /**
@@ -69,5 +71,63 @@ class User extends Authenticatable implements HasMedia
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function loadProfileData(): self
+    {
+        return $this->load([
+
+            'credit:id,user_id,balance,used,purchased_total',
+
+            'creditTransactions' => function ($q) {
+
+                $q->select(
+                    'id',
+                    'user_id',
+                    'type',
+                    'credits',
+                    'balance_after',
+                    'description',
+                    'created_at'
+                )
+                ->latest()
+                ->limit(5);
+            },
+            // 'resumes' => function ($q) {
+
+            //     $q->select(
+            //         'id',
+            //         'user_id',
+            //         'type',
+            //         'credits',
+            //         'balance_after',
+            //         'description',
+            //         'created_at'
+            //     )
+            //     ->latest()
+            //     ->limit(5);
+            // }
+        ])->loadCount('resumes')->loadCount('analyses');
+
+    }
+
+    public function credit()
+    {
+        return $this->hasOne(Credit::class);
+    }
+
+    public function creditTransactions()
+    {
+        return $this->hasMany(CreditTransaction::class);
+    }
+
+    public function resumes()
+    {
+        return $this->hasMany(Resume::class);
+    }
+
+    public function analyses()
+    {
+        return $this->hasMany(Analyse::class);
     }
 }

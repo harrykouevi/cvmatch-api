@@ -22,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'set.tenant' => \App\Http\Middleware\SetTenant::class,
             'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
             'auth:sanctum' => \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            'guest.or.auth' => \App\Http\Middleware\GuestOrAuthMiddleware::class,
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

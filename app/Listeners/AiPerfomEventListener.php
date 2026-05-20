@@ -35,6 +35,7 @@ class AiPerfomEventListener implements ShouldQueue
 
             $resumeText = $event->analyse->resume->extracted_text ;
             if (is_null($resumeText) || trim($resumeText) === '') {
+                log::error(['resumetext empty']) ;
                 throw new \Exception('Resume text is empty');
             }
 
@@ -54,25 +55,25 @@ class AiPerfomEventListener implements ShouldQueue
             $data = [
                 // "analysis_id"=> $event->analyse->id,
                 'status' =>'completed',
-                "score"=>  $aiData['ats_score'] ?? 0,
-                "score_breakdown_json" => [
-                        "match_level" => $aiData['match_level'] ?? null,
-                        "job_fit_summary" => $aiData['job_fit_summary'] ?? null,
-                    ],
+                "score"=>  $aiData['original_resume']['overall_ats_score'] ?? 0,
+                "match_level"=>  $aiData['original_resume']['match_level'] ?? null,
 
-                "critical_problems_json" => array_merge(
-                        $aiData['weak_sections'] ?? [],
-                        $aiData['warnings'] ?? []
-                    ),
-                "missing_keywords_json" => $aiData['missing_keywords'] ?? [],
+                "job_fit_summary"=>  $aiData['original_resume']['job_fit_summary'] ?? null,
+                "score_breakdown_json"  => $aiData['original_resume']['scoring_breakdown'] ?? [],
+                "missing_keywords_json" => $aiData['original_resume']['missing_keywords'] ?? [],
+                "missing_hard_skills_json"=> $aiData['original_resume']['missing_hard_skills'] ?? [],
+                "weak_sections_json" => $aiData['original_resume']['weak_sections'] ?? [],
+                "strong_points_json" => $aiData['original_resume']['strong_points'] ?? [],
+                "detected_problems_json" => $aiData['original_resume']['detected_problems'] ?? [],
+                "recruiter_risk_flags_json" => $aiData['original_resume']['recruiter_risk_flags'] ?? [],
+                "recommendations_json" => $aiData['recommendations'] ?? [],
+                "warnings_json" => $aiData['warnings'] ?? [],
 
-                "ats_issues_json"=> $aiData['warnings'] ?? [],
-
-                "optimized_resume"  => json_encode($aiData['optimized_resume'] ?? []),
-
+                // "optimized_resume"  => json_encode($aiData['optimized_resume_array'] ?? []),
+                "optimized_resume"  => $aiData['optimized_resume_array'] ?? [],
+                "optimized_resume_text" => $aiData['optimized_resume'] ?? null,
                 "cover_letter" => $aiData['cover_letter'] ?? null,
-
-
+                "optimized_resume_analysis_json" => $aiData['optimized_resume_analysis'] ?? [],
             ] ;
 
             $this->analyseRepository->update($data,$event->analyse->id);

@@ -17,6 +17,7 @@ class MobileWait extends Model implements Transformable
 
     use TransformableTrait;
 
+    protected $table = 'mobile_waitlist';
     /**
      * The attributes that are mass assignable.
      *
@@ -37,7 +38,7 @@ class MobileWait extends Model implements Transformable
     public static array $rules = [
 
         "email" => 'required|email',
-        "source"=> 'required|string'
+        "source"=> 'string'
 
     ];
 
