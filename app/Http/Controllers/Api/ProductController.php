@@ -37,7 +37,7 @@ class ProductController extends Controller
         } catch (Exception $e) {
             return $this->sendError($e->getMessage());
         }
-        $products = $this->creditPlanRepository->findWhere([ 'is_active' => true])->all();
+        $products = $this->creditPlanRepository->findWhere([ 'is_active' => true]);
 
         return $this->sendResponse( $products->toArray(),'plan get successfully'  );
 
