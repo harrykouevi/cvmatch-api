@@ -2,7 +2,7 @@
 
 PROJECT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PHP="/usr/local/php8.2/bin/php"
-LOGFILE="$PROJECT/storage/logs/queue.log"
+LOGFILE="$PROJECT/storage/logs/worker.log"
 
 echo "$(date) - Démarrage worker Laravel" >> "$LOGFILE"
 
