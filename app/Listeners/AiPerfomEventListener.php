@@ -34,7 +34,7 @@ class AiPerfomEventListener implements ShouldQueue
      */
     public function handle(AiPerfomEvent $event): void
     {
-        $analyse = $event->analyse;
+        $analyse = $event->analyse->fresh();
         $analyseId = $analyse->id;
 
         if ($analyse->status === 'processing') {
@@ -45,7 +45,7 @@ class AiPerfomEventListener implements ShouldQueue
         }
         $analyse->update(['status' => 'processing']);
 
-        $lock = Cache::lock("ai-perfom-event:{$analyseId}", 120);
+        $lock = Cache::lock("ai-perfom-event:{$analyseId}", 300);
 
         if (! $lock->get()) {
             Log::info('AI job already running', ['analyse_id' => $analyseId]);
@@ -62,13 +62,15 @@ class AiPerfomEventListener implements ShouldQueue
             // =====================================================
             if (empty(trim($resumeText ?? ''))) {
                 Log::info('Waiting for extracted_text generation', [ 'analyse_id' => $analyse?->id,'attempt' => $this->attempts(), ]);
-                if ($this->attempts() < $this->tries) {
-                    $this->release(15);
+                if ($this->attempts() >= $this->tries) {
+                    Log::error('Resume text still empty after max retries', [ 'analyse_id' => $analyseId, ]);
+                    $analyse->update([ 'status' => 'failed', ]);
                     return;
                 }
-                Log::error('Resume text still empty after max retries', ['analyse_id' => $analyse?->id, ]);
-                $analyse->update(['status' => 'failed']);
-                return; // stop définitivement
+
+                $analyse->update([ 'status' => 'pending', ]);
+                $this->release(15);
+                return;
             }
 
             $jobDescription= $analyse->job_description ?? null;
@@ -82,14 +84,15 @@ class AiPerfomEventListener implements ShouldQueue
             $response = $this->service->analyze($resumeText, $jobDescription);
             Log::info('openAI response AiPerfomEvent#' , [ 'response' => $response, ]);
 
-            if (! $response['success']) {
+            if (! ($response['success'] ?? false)) {
                 // =====================================================
                 // RETRY ONLY FOR RETRYABLE AI ERRORS
                 // =====================================================
                 $aiAttempts = ($analyse->ai_attempts ?? 0) + 1;
+                $analyse->update([ 'ai_attempts' => $aiAttempts, ]);
+
                 if (($response['retryable'] ?? false) === true) {
 
-                    $analyse->update([ 'ai_attempts' => $aiAttempts,]);
                     if ($aiAttempts < 5) {
                         Log::warning('Retrying OpenAI request', [ 'analyse_id' => $analyse->id, 'ai_attempt' => $aiAttempts]);
                         $analyse->update(['status' => 'pending' ]);
@@ -97,7 +100,7 @@ class AiPerfomEventListener implements ShouldQueue
                         return;
                     }
                 }
-
+                Log::error('AI analysis failed permanently', [ 'analyse_id' => $analyseId, 'response' => $response,]);
                 $analyse->update(['status' => 'failed']);
                 return;
             }
@@ -136,6 +139,7 @@ class AiPerfomEventListener implements ShouldQueue
             ] ;
 
             $this->analyseRepository->update($data,$analyse->id);
+            Log::info('AI analysis completed successfully', [ 'analyse_id' => $analyseId,]);
         } catch (\Throwable $e) {
 
             Log::error('AiPerfomEventListener failed', [
