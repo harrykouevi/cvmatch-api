@@ -8,6 +8,7 @@ use App\Services\OpenAIResumeService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 
 use Throwable;
 
@@ -32,9 +33,16 @@ class AiPerfomEventListener implements ShouldQueue
      */
     public function handle(AiPerfomEvent $event): void
     {
+        $analyse = $event->analyse;
+        $analyseId = $analyse->id;
+        $lock = Cache::lock("ai-perfom-event:{$analyseId}", 120);
+
+        if (! $lock->get()) {
+            Log::info('AI job already running', ['analyse_id' => $analyseId]);
+            return;
+        }
         try{
 
-            $analyse = $event->analyse;
             $resumeText = $analyse?->resume?->extracted_text;
 
             // =====================================================
@@ -104,6 +112,8 @@ class AiPerfomEventListener implements ShouldQueue
 
             // IMPORTANT : relance exception => active retry Laravel
             throw $e;
+        } finally {
+            optional($lock)->release();
         }
     }
 }
