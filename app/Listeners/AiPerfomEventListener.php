@@ -61,13 +61,14 @@ class AiPerfomEventListener implements ShouldQueue
             // =====================================================
             if (empty(trim($resumeText ?? ''))) {
                 Log::info('Waiting for extracted_text generation', [ 'analyse_id' => $analyse?->id,'attempt' => $this->attempts(), ]);
-
-                if ($this->attempts() >= $this->tries) {
-                    Log::error('Resume text still empty after max retries', ['analyse_id' => $analyse?->id, ]);
-                    return; // stop définitivement
+                if ($this->attempts() < $this->tries) {
+                    $this->release(15);
+                    return;
                 }
+
+                Log::error('Resume text still empty after max retries', ['analyse_id' => $analyse?->id, ]);
                 $analyse->update(['status' => 'failed']);
-                return;
+                return; // stop définitivement
             }
 
             $jobDescription= $analyse->job_description ?? null;
@@ -115,7 +116,7 @@ class AiPerfomEventListener implements ShouldQueue
                 "optimized_resume_analysis_json" => $aiData['optimized_resume_analysis'] ?? [],
             ] ;
 
-            $this->analyseRepository->update($data,$event->analyse->id);
+            $this->analyseRepository->update($data,$analyse->id);
         } catch (\Throwable $e) {
 
             Log::error('AiPerfomEventListener failed', [
