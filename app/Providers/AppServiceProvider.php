@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\AiCleanTextEvent;
+use App\Events\AiPerfomEvent;
+use App\Listeners\AiCleanTextEventListener;
+use App\Listeners\AiPerfomEventListener;
 use App\Models\Resume;
 use App\Repositories\AnalyseRepositoryEloquent;
 use App\Repositories\CreditPlanRepositoryEloquent;
@@ -28,6 +32,7 @@ use App\Repositories\ReviewRepositoryEloquent;
 use App\Repositories\UploadRepositoryEloquent;
 use App\Repositories\UserRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -55,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen( AiPerfomEvent::class,AiPerfomEventListener::class);
+        Event::listen( AiCleanTextEvent::class,AiCleanTextEventListener::class);
     }
 }

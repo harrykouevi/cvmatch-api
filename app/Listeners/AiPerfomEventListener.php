@@ -35,20 +35,20 @@ class AiPerfomEventListener implements ShouldQueue
 
             $resumeText = $event->analyse->resume->extracted_text ;
             if (is_null($resumeText) || trim($resumeText) === '') {
-                log::error(['resumetext empty']) ;
+                log::error(['AiPerfomEvent resumetext empty']) ;
                 throw new \Exception('Resume text is empty');
             }
 
             $jobDescription= $event->analyse->job_description ;
             $response = $this->service->analyze($resumeText, $jobDescription) ;
-            Log::info('openAI response#' , [
+            Log::info('openAI response AiPerfomEvent#' , [
                 'response' => $response,
             ]);
 
             $aiData = $response['data'] ?? null;
 
             if (!$aiData) {
-                Log::error('Invalid AI response');
+                Log::error('AiPerfomEvent Invalid AI response');
                 return;
             }
 
