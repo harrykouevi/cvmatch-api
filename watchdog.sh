@@ -6,14 +6,16 @@ LOGFILE="$PROJECT/storage/logs/worker.log"
 
 echo "$(date) - Démarrage worker Laravel" >> "$LOGFILE"
 
-# if ! pgrep -f "artisan queue:work" > /dev/null; then
+while true
+do
+  if ! pgrep -f "artisan queue:work" > /dev/null
+  then
     echo "$(date) - Worker absent, démarrage..." >> "$LOGFILE"
 
-    $PHP $PROJECT/artisan queue:work \
-        --sleep=3 \
-        --tries=3 \
-        --timeout=90 \
-        >> "$LOGFILE" 2>&1 &
-# else
-#     echo "$(date) - Worker déjà actif" >> "$LOGFILE"
-# fi
+    $PHP $PROJECT/artisan queue:work database --queue=default,ai --sleep=3 --tries=3 --timeout=90 >> "$LOGFILE" 2>&1 &
+else
+    echo "$(date) - Worker déjà en cours d'exécution." >> "$LOGFILE"
+  fi
+  sleep 3000
+done
+

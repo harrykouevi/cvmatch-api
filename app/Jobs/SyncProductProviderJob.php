@@ -17,7 +17,7 @@ class SyncProductProviderJob implements ShouldQueue
      */
     public function __construct( public string $provider)
     {
-        //
+        $this->onQueue('default');
     }
 
     /**

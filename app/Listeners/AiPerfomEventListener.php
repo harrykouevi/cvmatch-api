@@ -29,6 +29,11 @@ class AiPerfomEventListener implements ShouldQueue
     )
     {}
 
+    public function viaQueue(): string
+    {
+        return 'ai';
+    }
+
     /**
      * Handle the event.
      */
