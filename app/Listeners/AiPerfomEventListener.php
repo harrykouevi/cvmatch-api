@@ -35,12 +35,23 @@ class AiPerfomEventListener implements ShouldQueue
     {
         $analyse = $event->analyse;
         $analyseId = $analyse->id;
+
+        if ($analyse->status === 'processing') {
+            Log::info('AI already processing (DB lock)', [
+                'analyse_id' => $analyseId
+            ]);
+            return;
+        }
+        $analyse->update(['status' => 'processing']);
+
         $lock = Cache::lock("ai-perfom-event:{$analyseId}", 120);
 
         if (! $lock->get()) {
             Log::info('AI job already running', ['analyse_id' => $analyseId]);
+            $analyse->update(['status' => 'pending']);
             return;
         }
+
         try{
 
             $resumeText = $analyse?->resume?->extracted_text;
@@ -55,7 +66,7 @@ class AiPerfomEventListener implements ShouldQueue
                     Log::error('Resume text still empty after max retries', ['analyse_id' => $analyse?->id, ]);
                     return; // stop définitivement
                 }
-                $this->release(15); // retry dans 15 secondes
+                $analyse->update(['status' => 'failed']);
                 return;
             }
 
@@ -63,6 +74,7 @@ class AiPerfomEventListener implements ShouldQueue
 
             if (empty($jobDescription)) {
                 Log::error('Job description empty', [ 'analyse_id' => $analyse->id,]);
+                $analyse->update(['status' => 'failed']);
                 return;
             }
 
@@ -75,6 +87,7 @@ class AiPerfomEventListener implements ShouldQueue
 
             if (!$aiData) {
                 Log::error('AiPerfomEvent Invalid AI response');
+                $analyse->update(['status' => 'failed']);
                 return;
             }
 
@@ -109,6 +122,8 @@ class AiPerfomEventListener implements ShouldQueue
                 'message' => $e->getMessage(),
                 'analyse_id' => $event->analyse->id ?? null,
             ]);
+
+            $analyse->update(['status' => 'failed']);
 
             // IMPORTANT : relance exception => active retry Laravel
             throw $e;
