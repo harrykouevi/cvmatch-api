@@ -35,7 +35,7 @@ class Analyse extends Model implements Transformable, HasMedia
         "job_description",
         "status",
         "is_full_unlocked",
-
+        "ai_attempts",
 
         "score",
         "match_level",

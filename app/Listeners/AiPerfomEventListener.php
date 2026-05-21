@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
+use GuzzleHttp\Exception\ConnectException;
 
 use Throwable;
 
@@ -65,7 +66,6 @@ class AiPerfomEventListener implements ShouldQueue
                     $this->release(15);
                     return;
                 }
-
                 Log::error('Resume text still empty after max retries', ['analyse_id' => $analyse?->id, ]);
                 $analyse->update(['status' => 'failed']);
                 return; // stop définitivement
@@ -79,10 +79,28 @@ class AiPerfomEventListener implements ShouldQueue
                 return;
             }
 
-            $response = $this->service->analyze($resumeText, $jobDescription) ;
-            Log::info('openAI response AiPerfomEvent#' , [
-                'response' => $response,
-            ]);
+            $response = $this->service->analyze($resumeText, $jobDescription);
+            Log::info('openAI response AiPerfomEvent#' , [ 'response' => $response, ]);
+
+            if (! $response['success']) {
+                // =====================================================
+                // RETRY ONLY FOR RETRYABLE AI ERRORS
+                // =====================================================
+                if (($response['retryable'] ?? false) === true) {
+                    $aiAttempts = ($analyse->ai_attempts ?? 0) + 1;
+                    $analyse->update([ 'ai_attempts' => $aiAttempts,]);
+                    if ($aiAttempts < 5) {
+                        Log::warning('Retrying OpenAI request', [ 'analyse_id' => $analyse->id, 'ai_attempt' => $aiAttempts]);
+                        $analyse->update(['status' => 'pending' ]);
+                        $this->release(20);
+                        return;
+                    }
+                }
+
+                $analyse->update(['status' => 'failed']);
+                return;
+            }
+
 
             $aiData = $response['data'] ?? null;
 

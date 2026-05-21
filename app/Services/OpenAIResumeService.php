@@ -10,140 +10,6 @@ class OpenAIResumeService
     private Client $client;
     private string $apiKey;
     private string $model;
-    private string $fakeResume = "KOUEVI Harry Ayigan
-        Ingénieur Backend & Systèmes | Administrateur Linux | Gestion de Projets IT
-        📍 Lomé, Togo | 📞 +22890365486 | harry.kouevi@gmail.com
-
-        PROFIL PROFESSIONNEL
-        Ingénieur Backend & Systèmes avec plus de 10 ans d’expérience dans la conception, le développement, le déploiement et la supervision de solutions informatiques.
-
-        Je possède une double expertise en développement logiciel et en administration systèmes, me permettant d’intervenir sur l’ensemble du cycle de vie des projets IT : architecture technique, développement, mise en production, supervision, maintenance et optimisation des performances.
-
-        Expérimenté dans la gestion de projets digitaux, l’encadrement d’équipes techniques et l’administration d’environnements Linux, je contribue à garantir la disponibilité, la sécurité et la stabilité des systèmes d’information.
-
-        Rigoureux, organisé et orienté résultats, je souhaite mettre mes compétences techniques et organisationnelles au service d’un environnement exigeant, où les enjeux de performance, de sécurité et de continuité des services sont critiques.
-
-        COMPÉTENCES TECHNIQUES
-
-        Backend & Développement
-        ● PHP (Laravel), JavaScript, Node.js
-        ● Conception et développement d’APIs REST
-        ● Architecture backend scalable
-        ● Intégration d’applications web et services
-
-        Frontend
-        ● AngularJS, Vue.js, HTML5, Bootstrap
-
-        DevOps & Administration Systèmes
-        ● Administration Linux (Ubuntu, CentOS)
-        ● Déploiement et maintenance d’applications sur serveurs (VPS, dédiés)
-        ● Docker (containerisation)
-        ● Bash scripting
-        ● Monitoring et supervision des systèmes
-        ● Notions de virtualisation (VMware, VirtualBox)
-        ● Notions de Windows Server
-
-        Base de données
-        ● MySQL (modélisation, optimisation des performances)
-        ● Notions de PostgreSQL
-        ● Gestion et supervision de bases de données
-
-        Réseaux
-        ● Configuration DNS, DHCP, routing
-        ● Notions en cybersécurité
-        ● Notions en sécurité réseau (firewall, VPN)
-
-        Gestion de projets & Outils
-        ● Gestion de projets Agile / Scrum
-        ● Coordination d’équipes techniques
-        ● Git
-
-        EXPÉRIENCE PROFESSIONNELLE
-
-        Développeur Chef de projet
-        Business Help Consulting, LOMÉ-TOGO, Région Maritime
-        Décembre 2024 - Présent
-        ● Pilotage de projets digitaux en méthodologie Agile (Scrum)
-        ● Coordination et encadrement d’équipe technique
-        ● Conception et développement d’une plateforme de prise de rendez-vous
-        ● Développement et intégration d’APIs REST avec application mobile (Flutter)
-        ● Déploiement et maintenance des applications sur serveurs Linux
-        ● Gestion des mises en production et suivi des déploiements
-        ● Optimisation des performances et amélioration de la disponibilité des services
-        ● Surveillance des serveurs et résolution des incidents techniques
-        ● Mise en production et suivi des déploiements applicatifs
-        ● Résolution des incidents techniques et maintenance corrective
-
-        Consultant Développeur Backend
-        LIKSOFT, LOMÉ-TOGO, Région Maritime
-        Octobre 2020 – Octobre 2024
-        ● Pilotage de projets digitaux en méthodologie Agile (Scrum)
-        ● Conception d’architectures backend robustes et scalables
-        ● Développement d’applications métiers (RH, facturation, gestion de prêts)
-        ● Création d’APIs REST sécurisées et performantes
-        ● Déploiement d’applications avec Docker sur environnements Linux
-        ● Contribution à la haute disponibilité des systèmes et services en production
-        ● Intégration avec interfaces (AngularJS)
-        ● Optimisation des performances des bases de données MySQL
-        ● Maintenance évolutive et corrective des applications
-
-        Administrateur de Base de Données
-        Commission Électorale Nationale Indépendante, Togo
-        2019 – 2024
-        ● Garantie de l’intégrité, sécurité et disponibilité des données
-        ● Optimisation des performances des systèmes
-        ● Support aux opérations électorales critiques
-
-        Freelance sur l'application web FOCUSAFRIK.COM
-        Force One, LOMÉ-TOGO, Région Maritime
-        Septembre 2017 – Mai 2019
-        ● Conception et mise en œuvre d'une structure de données robuste, optimisée pour répondre aux besoins variés de la plateforme, garantissant une gestion efficace des informations.
-        ● Gestion des menus et rubriques, assurant une navigation fluide et intuitive pour les utilisateurs, ce qui a amélioré l'expérience globale sur le site.
-        ● Gestion des comptes utilisateurs, y compris les comptes administrateurs, articles, forums de discussion, ainsi que la gestion des annonceurs publicitaires et des publicités, permettant un contrôle rigoureux du contenu et des interactions.
-        ● Optimisation des processus backend, contribuant à la performance et à la scalabilité de l'application, afin de s'adapter aux fluctuations de la demande utilisateur sans compromettre la qualité du service.
-
-        Développeur Full Stack
-        KEOGRAPHIX, LOMÉ-TOGO, Région Maritime
-        Septembre 2016 – Septembre 2017
-        ● Responsable du développement d'un logiciel de gestion de portefeuille, optimisant la gestion des inventaires pour les utilisateurs.
-        ● Implémentation de solutions backend robustes : Développement en JavaScript et Laravel, ce qui a permis de réduire le temps de traitement des données.
-        ● Contribution aux phases d'analyse et de conception : Participation active dans le cycle de vie du développement logiciel, à savoir l'analyse, la conception et le déploiement.
-        ● Maintenance et mise à jour des applications web, assurant leur bon fonctionnement et intégrant de nouvelles fonctionnalités en réponse aux besoins des utilisateurs.
-
-        Stagiaire Développeur Full Stack
-        SUNU Assurances IARD-TOGO, LOMÉ-TOGO, Région Maritime
-        2015 – 2016
-        ● Développement d’applications internes (assurance, infirmerie)
-        ● Utilisation de Laravel et MySQL
-        ● Participation au cycle complet de développement
-
-        FORMATION
-
-        Licence en Informatique – Niveau Bac+3
-        IAEC, LOMÉ-TOGO, Région Maritime
-        Année académique : 2023 – 2024
-
-        Brevet de technicien Supérieur en Informatique
-        IAEC, LOMÉ-TOGO, Région Maritime
-        Année d'obtention : 2013
-
-        Baccalauréat série D
-        Lycée Général d’Adidogomé, LOMÉ-TOGO, Région Maritime
-        Année d'obtention : 2010
-
-        LANGUES
-        ● Français : Courant
-        ● Anglais : Niveau technique et professionnel
-
-        QUALITÉS PROFESSIONNELLES
-        ● Sens de l’organisation et rigueur
-        ● Capacité d’analyse et de synthèse
-        ● Gestion du stress et des priorités
-        ● Bon relationnel et esprit d’équipe
-        ● Capacité d’adaptation
-        ● Sens des responsabilités
-        ● Discrétion et professionnalisme
-        ● Esprit d’initiative et autonomie" ;
 
     public function __construct()
     {
@@ -211,27 +77,35 @@ class OpenAIResumeService
                 'success' => true,
                 'data' => json_decode($output, true),
             ];
-        } catch (\GuzzleHttp\Exception\ConnectException $e) {
 
-            Log::error('OpenAI timeout / connection error', [
-                'message' => $e->getMessage(),
-            ]);
-
+        }catch (\GuzzleHttp\Exception\ConnectException $e) {
+            Log::warning('OpenAI connect error (retryable)', [ 'message' => $e->getMessage(), ]);
             return [
                 'success' => false,
-                'message' => 'OpenAI timeout',
+                'error_type' => 'connect_exception',
+                'retryable' => true,
+                'message' => 'OpenAI connection failed',
             ];
+        }catch (\GuzzleHttp\Exception\RequestException $e) {
 
-        }  catch (\Throwable $e) {
-            Log::error('OpenAI analysis failed', [
-                'message' => $e->getMessage(),
-            ]);
-
+            // =====================================================
+            // TIMEOUT ERROR (RETRYABLE ALSO)
+            // =====================================================
+            Log::warning('OpenAI request exception', [ 'message' => $e->getMessage(),]);
             return [
                 'success' => false,
+                'error_type' => 'request_exception',
+                'retryable' => true,
+                'message' => 'OpenAI request failed',
+            ];
+        }  catch (\Throwable $e) {
+            Log::error('OpenAI analysis failed', [ 'message' => $e->getMessage(),]);
+            return [
+                'success' => false,
+                'error_type' => 'fatal',
+                'retryable' => false,
                 'message' => 'AI analysis failed',
             ];
-
         }
     }
 
