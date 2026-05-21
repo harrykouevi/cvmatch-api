@@ -155,7 +155,7 @@ return [
 
     'default' => [
         'scheme' => 'unix',
-        'path' => env('REDIS_HOST', 'unix:///home/sys/redis.sock'),
+        'host' => env('REDIS_HOST', 'unix:///home/sys/redis.sock'),
         'database' => env('REDIS_DB', 0),
     ],
 
