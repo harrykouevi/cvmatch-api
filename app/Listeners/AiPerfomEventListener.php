@@ -5,16 +5,17 @@ namespace App\Listeners;
 use App\Events\AiPerfomEvent;
 use App\Repositories\Interfaces\AnalyseRepository;
 use App\Services\OpenAIResumeService;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 use Throwable;
 
 class AiPerfomEventListener implements ShouldQueue
 {
-    public $tries = 5;
+    use InteractsWithQueue;
 
+    public $tries = 5;
     public $backoff = [10, 30, 60];
 
     /**
@@ -33,13 +34,30 @@ class AiPerfomEventListener implements ShouldQueue
     {
         try{
 
-            $resumeText = $event->analyse->resume->extracted_text ;
-            if (is_null($resumeText) || trim($resumeText) === '') {
-                log::error(['AiPerfomEvent resumetext empty']) ;
-                throw new \Exception('Resume text is empty');
+            $analyse = $event->analyse;
+            $resumeText = $analyse?->resume?->extracted_text;
+
+            // =====================================================
+            // RETRY SAFE WAIT (DEPENDENCY: extract text job)
+            // =====================================================
+            if (empty(trim($resumeText ?? ''))) {
+                Log::info('Waiting for extracted_text generation', [ 'analyse_id' => $analyse?->id,'attempt' => $this->attempts(), ]);
+
+                if ($this->attempts() >= $this->tries) {
+                    Log::error('Resume text still empty after max retries', ['analyse_id' => $analyse?->id, ]);
+                    return; // stop définitivement
+                }
+                $this->release(15); // retry dans 15 secondes
+                return;
             }
 
-            $jobDescription= $event->analyse->job_description ;
+            $jobDescription= $analyse->job_description ?? null;
+
+            if (empty($jobDescription)) {
+                Log::error('Job description empty', [ 'analyse_id' => $analyse->id,]);
+                return;
+            }
+
             $response = $this->service->analyze($resumeText, $jobDescription) ;
             Log::info('openAI response AiPerfomEvent#' , [
                 'response' => $response,
