@@ -8,11 +8,11 @@ echo "$(date) - Démarrage worker default Laravel" >> "$LOGFILE"
 
 while true
 do
-  if ! pgrep -f "artisan queue:work database --queue=default" > /dev/null
+  if ! pgrep -f "artisan queue:work redis --queue=default" > /dev/null
   then
     echo "$(date) - Worker default absent, démarrage..." >> "$LOGFILE"
 
-    $PHP $PROJECT/artisan queue:work database --queue=default --sleep=3 --tries=3 --timeout=90 >> "$LOGFILE" 2>&1 &
+    $PHP $PROJECT/artisan queue:work redis --queue=default --sleep=3 --tries=3 --timeout=90 >> "$LOGFILE" 2>&1 &
 else
     echo "$(date) - Worker default déjà en cours d'exécution." >> "$LOGFILE"
   fi
