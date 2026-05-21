@@ -154,9 +154,8 @@ return [
     ],
 
     'default' => [
-        'scheme' => 'tcp',
-        'host' => env('REDIS_HOST', '127.0.0.1'),
-        'port' => env('REDIS_PORT', 6379),
+        'scheme' => 'unix',
+        'path' => env('REDIS_HOST', 'unix:///home/sys/redis.sock'),
         'database' => env('REDIS_DB', 0),
     ],
 
