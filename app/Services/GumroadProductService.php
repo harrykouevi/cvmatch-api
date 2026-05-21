@@ -84,9 +84,7 @@ class GumroadProductService
 
             $data = json_decode($response->getBody()->getContents(), true);
 
-            Log::info(' fetching products from Gumroad', [
-                'message' => $data,
-            ]);
+            Log::info(' fetching products from Gumroad');
 
             return $data['products'] ?? [];
 

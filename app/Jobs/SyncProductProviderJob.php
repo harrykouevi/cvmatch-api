@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Services\Providers\CreditPlanProviderFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class SyncProductProviderJob implements ShouldQueue
@@ -29,7 +30,7 @@ class SyncProductProviderJob implements ShouldQueue
         ]);
 
 
-        $lock = cache()->lock("sync_{$this->provider}", 300);
+        $lock = Cache::lock("sync_{$this->provider}", 300);
 
         if (!$lock->block(5)) {
             return;
