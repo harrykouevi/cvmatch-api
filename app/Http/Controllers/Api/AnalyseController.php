@@ -69,6 +69,7 @@ class AnalyseController extends Controller
             $input['is_full_unlocked'] = false;
 
             $analyse = $this->analyseRepository->create($input);
+            Log::info("about to perform ai :");
 
             //event senttoperforme AI prompt
             event(new AiPerfomEvent($analyse));
