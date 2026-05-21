@@ -86,8 +86,9 @@ class AiPerfomEventListener implements ShouldQueue
                 // =====================================================
                 // RETRY ONLY FOR RETRYABLE AI ERRORS
                 // =====================================================
+                $aiAttempts = ($analyse->ai_attempts ?? 0) + 1;
                 if (($response['retryable'] ?? false) === true) {
-                    $aiAttempts = ($analyse->ai_attempts ?? 0) + 1;
+
                     $analyse->update([ 'ai_attempts' => $aiAttempts,]);
                     if ($aiAttempts < 5) {
                         Log::warning('Retrying OpenAI request', [ 'analyse_id' => $analyse->id, 'ai_attempt' => $aiAttempts]);
