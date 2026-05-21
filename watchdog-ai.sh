@@ -6,16 +6,16 @@ LOGFILE="$PROJECT/storage/logs/worker.log"
 
 echo "$(date) - Démarrage worker ai Laravel" >> "$LOGFILE"
 
-while true
-do
-  if ! pgrep -f "artisan queue:work  redis --queue=ai" > /dev/null
-  then
+# while true
+# do
+#   if ! pgrep -f "artisan queue:work  redis --queue=ai" > /dev/null
+#   then
     echo "$(date) - Worker ai absent, démarrage..." >> "$LOGFILE"
 
     $PHP $PROJECT/artisan queue:work redis --queue=ai --sleep=3 --tries=3 --timeout=90 >> "$LOGFILE" 2>&1 &
-else
-    echo "$(date) - Worker ai déjà en cours d'exécution." >> "$LOGFILE"
-  fi
-  sleep 10
-done
+# else
+#     echo "$(date) - Worker ai déjà en cours d'exécution." >> "$LOGFILE"
+#   fi
+#   sleep 10
+# done
 
