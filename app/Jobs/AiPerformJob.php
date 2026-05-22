@@ -20,6 +20,7 @@ class AiPerformJob implements ShouldQueue
 
 
     public $tries = 5;
+    public $timeout = 120;
     public $backoff = [10, 30, 60];
 
     /**
@@ -36,33 +37,39 @@ class AiPerformJob implements ShouldQueue
     public function handle(AnalyseRepository $analyseRepository , OpenAIResumeService $service): void
     {
 
-        $analyse = $this->analyse->fresh();
+        $analyse = Analyse::findOrFail($this->analyse->id);
         $analyseId = $analyse->id;
 
-        if ($analyse->status === 'processing') {
-            Log::info('AI already processing (DB lock)', [
-                'analyse_id' => $analyseId
-            ]);
-            return;
-        }
-        $analyse->update(['status' => 'processing']);
+        $lockKey = "ai:analyse:{$analyse->id}";
 
-        $lock = Cache::lock("ai-perfom-event:{$analyseId}", 300);
+        $lock = Cache::lock($lockKey, 600);
 
         if (! $lock->get()) {
-            Log::info('AI job already running', ['analyse_id' => $analyseId]);
-            $analyse->update(['status' => 'pending']);
+            // Log::info('AI job already running', ['analyse_id' => $analyseId]);
+            // $analyse->update(['status' => 'pending']);
             return;
         }
 
         try{
 
-            $resumeText = $analyse?->resume?->extracted_text;
+            if ($analyse->status === 'completed') {
+                return;
+            }
+            $wasLocked = $analyse->updateWhereStatus('pending', 'processing');
+            if (! $wasLocked) {
+                Log::info('AI already processing', [
+                    'analyse_id' => $analyseId,
+                ]);
+                return;
+            }
+
+
+            $resumeText = $analyse->resume?->extracted_text  ?? null;
 
             // =====================================================
             // RETRY SAFE WAIT (DEPENDENCY: extract text job)
             // =====================================================
-            if (empty(trim($resumeText ?? ''))) {
+             if (blank($resumeText)) {
                 Log::info('Waiting for extracted_text generation', [ 'analyse_id' => $analyse?->id,'attempt' => $this->attempts(), ]);
                 if ($this->attempts() >= $this->tries) {
                     Log::error('Resume text still empty after max retries', [ 'analyse_id' => $analyseId, ]);
@@ -75,32 +82,28 @@ class AiPerformJob implements ShouldQueue
                 return;
             }
 
-            $jobDescription= $analyse->job_description ?? null;
-
-            if (empty($jobDescription)) {
+            if (blank($analyse->job_description)) {
                 Log::error('Job description empty', [ 'analyse_id' => $analyse->id,]);
                 $analyse->update(['status' => 'failed']);
                 return;
             }
 
-            $response = $service->analyze($resumeText, $jobDescription);
+            $response = $service->analyze($resumeText, $analyse->job_description);
             Log::info('openAI response AiPerfomEvent#' , [ 'response' => $response, ]);
 
             if (! ($response['success'] ?? false)) {
                 // =====================================================
                 // RETRY ONLY FOR RETRYABLE AI ERRORS
                 // =====================================================
-                $aiAttempts = ($analyse->ai_attempts ?? 0) + 1;
-                $analyse->update([ 'ai_attempts' => $aiAttempts, ]);
 
-                if (($response['retryable'] ?? false) === true) {
+                $analyse->update([ 'ai_attempts' => ($analyse->ai_attempts ?? 0) + 1, ]);
+                $aiAttempts = $analyse->ai_attempts;
 
-                    if ($aiAttempts < 5) {
-                        Log::warning('Retrying OpenAI request', [ 'analyse_id' => $analyse->id, 'ai_attempt' => $aiAttempts]);
-                        $analyse->update(['status' => 'pending' ]);
-                        $this->release(20);
-                        return;
-                    }
+                if (($response['retryable'] ?? false) && $aiAttempts < 5) {
+                    Log::warning('Retrying OpenAI request', [ 'analyse_id' => $analyse->id, 'ai_attempt' => $aiAttempts]);
+                    $analyse->update(['status' => 'pending' ]);
+                    $this->release(20);
+                    return;
                 }
                 Log::error('AI analysis failed permanently', [ 'analyse_id' => $analyseId, 'response' => $response,]);
                 $analyse->update(['status' => 'failed']);
@@ -140,7 +143,10 @@ class AiPerformJob implements ShouldQueue
                 "optimized_resume_analysis_json" => $aiData['optimized_resume_analysis'] ?? [],
             ] ;
 
-            $analyseRepository->update($data,$analyse->id);
+             Analyse::where('id', $analyse->id)
+                ->where('status', 'processing')
+                ->update($data) ;
+            // $analyseRepository->update($data,$analyseId);
             Log::info('AI analysis completed successfully', [ 'analyse_id' => $analyseId,]);
         } catch (\Throwable $e) {
 
@@ -149,7 +155,10 @@ class AiPerformJob implements ShouldQueue
                 'analyse_id' => $event->analyse->id ?? null,
             ]);
 
-            $analyse->update(['status' => 'failed']);
+            // $analyse->update(['status' => 'failed']);
+            Analyse::where('id', $this->analyse->id)
+                ->where('status', 'processing')
+                ->update(['status' => 'failed']);
 
             // IMPORTANT : relance exception => active retry Laravel
             throw $e;
