@@ -60,7 +60,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Event::listen( AiPerfomEvent::class,AiPerfomEventListener::class);
-        Event::listen( AiCleanTextEvent::class,AiCleanTextEventListener::class);
+        //pas besoin cette version de laravel le fait deja automatiquement
+        // Event::listen( AiPerfomEvent::class,AiPerfomEventListener::class);
+        // Event::listen( AiCleanTextEvent::class,AiCleanTextEventListener::class);
     }
 }
