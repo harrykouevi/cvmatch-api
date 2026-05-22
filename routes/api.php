@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
+Route::get('/payements/gumroad', [PaymentsController::class, 'redirectToGumroad']);
+Route::post('/gumroad/webhook', [PaymentsController::class, 'handleGumroadWebhook'])->name('payments.webhooks.gumroad');
+
+
 Route::prefix('v1')->group(function () {
 
     // GET /api/credit-plans✔️
@@ -25,7 +29,6 @@ Route::prefix('v1')->group(function () {
     // POST /api/events/track
     Route::post('events/track', [EventController::class, 'store'])->name('events.store');
 
-    Route::post('/payments/webhooks/gumroad', [PaymentsController::class, 'handleGumroadWebhook'])->name('payments.webhooks.gumroad');
     Route::get('/payments/webhooks/simulation', [PaymentsController::class, 'simulateWebhook'])->name('payments.webhooks.simulation');
 
     Route::middleware(['guest.or.auth'])->group(function () {

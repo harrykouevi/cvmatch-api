@@ -85,10 +85,28 @@ class PaymentsController extends Controller
         );
     }
 
+
+    public function redirectToGumroad(Request $request)
+    {
+        $data = $request->all();
+        $paylink = $data['link'] ?? null;
+        return redirect("{$paylink}?wanted=true ");
+    }
+
     public function handleGumroadWebhook(Request $request)
     {
         $data = $request->all();
+        $saleId = $data['sale_id'] ?? null;
+
+        $user = User::where('email', $data['email'])->first();
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        if (!$saleId) {
+            return response()->json(['error' => 'Missing sale_id'], 400);
+        }
+
         DB::transaction(function () use ($data) {
+
 
             $existingPayment = $this->paymentRepository->findByField( 'provider_payment_id', $data['sale_id'])->first() ;
             if ($existingPayment && $existingPayment->status === 'paid') {
@@ -140,9 +158,9 @@ class PaymentsController extends Controller
             );
         });
 
-        return response()->json([
-            'success' => true
-        ]);
+        $user = User::where('email', $data['email'])->first();
+        $token = $user->createToken('api-token')->plainTextToken;
+        return redirect("http://localhost:5173/payement/callback?token={$token}");
     }
 
     public function simulateWebhook(Request $request)
