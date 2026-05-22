@@ -4,6 +4,8 @@ namespace App\Listeners;
 
 use App\Events\AiPerfomEvent;
 use App\Jobs\AiPerformJob;
+use Illuminate\Support\Facades\Log;
+
 class AiPerfomEventListener
 {
 
@@ -18,6 +20,8 @@ class AiPerfomEventListener
      */
     public function handle(AiPerfomEvent $event): void
     {
+        Log::info('abraaa' );
+
         AiPerformJob::dispatch($event->analyse);
     }
 }
