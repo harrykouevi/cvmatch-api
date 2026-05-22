@@ -55,7 +55,9 @@ class AiPerformJob implements ShouldQueue
             if ($analyse->status === 'completed') {
                 return;
             }
-            $wasLocked = $analyse->updateWhereStatus('pending', 'processing');
+            $wasLocked = $analyse->where('id', $analyse->id)
+                ->where('status', 'pending')
+                ->update(['status' => 'processing']) ;
             if (! $wasLocked) {
                 Log::info('AI already processing', [
                     'analyse_id' => $analyseId,
