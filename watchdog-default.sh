@@ -12,7 +12,7 @@ echo "$(date) - Démarrage worker default Laravel" >> "$LOGFILE"
 #   then
     echo "$(date) - Worker default absent, démarrage..." >> "$LOGFILE"
 
-    $PHP $PROJECT/artisan queue:work redis --queue=default --sleep=3 --tries=3 --timeout=90 >> "$LOGFILE" 2>&1 &
+    $PHP $PROJECT/artisan queue:work redis --queue=default --sleep=3 --tries=3 --timeout=90 >> "$LOGFILE" 2>&1
 # else
 #     echo "$(date) - Worker default déjà en cours d'exécution." >> "$LOGFILE"
 #   fi

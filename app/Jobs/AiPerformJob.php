@@ -36,6 +36,7 @@ class AiPerformJob implements ShouldQueue
      */
     public function handle(AnalyseRepository $analyseRepository , OpenAIResumeService $service): void
     {
+        Log::info('Starting AI job ');
 
         $analyse = Analyse::findOrFail($this->analyse->id);
         $analyseId = $analyse->id;
