@@ -71,7 +71,11 @@ class AnalyseController extends Controller
             $analyse = $this->analyseRepository->create($input);
             Log::info("about to perform ai :");
 
-            //event senttoperforme AI prompt
+            Log::info('EVENT DISPATCH', [
+                'analyse_id' => $analyse->id,
+                'time' => microtime(true),
+            ]);
+
             event(new AiPerfomEvent($analyse));
 
         } catch (ValidationException $e) {

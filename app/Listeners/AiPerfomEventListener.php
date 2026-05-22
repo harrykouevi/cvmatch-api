@@ -21,6 +21,10 @@ class AiPerfomEventListener
     public function handle(AiPerfomEvent $event): void
     {
         Log::info('abraaa' );
+        Log::info('LISTENER HIT', [
+            'analyse_id' => $event->analyse->id,
+            'time' => microtime(true),
+        ]);
 
         AiPerformJob::dispatch($event->analyse);
     }
