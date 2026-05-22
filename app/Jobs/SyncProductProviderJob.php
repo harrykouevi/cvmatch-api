@@ -32,7 +32,10 @@ class SyncProductProviderJob implements ShouldQueue
 
         $lock = Cache::lock("sync_{$this->provider}", 300);
 
-        if (!$lock->block(5)) {
+        if (! $lock->get()) {
+            Log::info('Sync skipped - already running', [
+                'provider' => $this->provider,
+            ]);
             return;
         }
 
