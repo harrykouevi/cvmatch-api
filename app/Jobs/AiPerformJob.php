@@ -39,13 +39,13 @@ class AiPerformJob implements ShouldQueue
 
         $analyse = Analyse::findOrFail($this->analyse->id);
         $analyseId = $analyse->id;
+        Log::info('Starting AI job ', ['analyse_id' => $analyseId]);
+
 
         $lockKey = "ai:analyse:{$analyse->id}";
-
         $lock = Cache::lock($lockKey, 600);
-
         if (! $lock->get()) {
-            // Log::info('AI job already running', ['analyse_id' => $analyseId]);
+            Log::info('AI job already running', ['analyse_id' => $analyseId]);
             // $analyse->update(['status' => 'pending']);
             return;
         }
