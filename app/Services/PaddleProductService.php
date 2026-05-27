@@ -40,8 +40,35 @@ class PaddleProductService
 
 
         Log::info('list of products',[
-                '$products' => $products,
-            ]);
+            '$products' => $products,
+        ]);
+
+
+        Log::info('list of products', [
+            'products_count' => count($products),
+        ]);
+
+        /**
+         * 1. Construire les IDs Paddle existants
+         */
+        $paddleProductIds = [];
+        $paddlePriceIds = [];
+
+        foreach ($products as $product) {
+            $paddleProductIds[] = $product['id'];
+
+            if (!empty($product['prices'])) {
+                foreach ($product['prices'] as $price) {
+                    $paddlePriceIds[] = $price['id'];
+                }
+            }
+        }
+
+        $paddleProductIds = array_unique($paddleProductIds);
+        $paddlePriceIds = array_unique($paddlePriceIds);
+
+
+
         $synced = [];
 
 
@@ -86,6 +113,25 @@ class PaddleProductService
                 );
             }
         }
+
+        /**
+         * 3. SUPPRESSION des produits qui n'existent plus chez Paddle
+         */
+
+        // a) supprimer produits orphelins
+        $this->creditPlanRepository->deleteWhereNotIn(
+            'provider_product_id',
+            $paddleProductIds,
+            'paddle'
+        );
+
+        // b) supprimer prix orphelins
+        $this->creditPlanRepository->deleteWhereNotIn(
+            'provider_price_id',
+            $paddlePriceIds,
+            'paddle'
+        );
+
 
         // return $synced;
     }

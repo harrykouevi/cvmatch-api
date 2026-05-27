@@ -11,5 +11,16 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  */
 interface CreditPlanRepository extends RepositoryInterface
 {
-    //
+    /**
+     * Retrieve data array for populate field select
+     *
+     * @param string $column
+     * @param array $paddleProductIds
+     * @param string $provider
+     */
+    public function deleteWhereNotIn(
+            string $column,
+            array $paddleProductIds,
+            string $provider
+        );
 }

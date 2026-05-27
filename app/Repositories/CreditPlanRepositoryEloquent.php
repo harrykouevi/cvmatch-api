@@ -25,6 +25,13 @@ class CreditPlanRepositoryEloquent extends BaseRepository implements CreditPlanR
         return CreditPlan::class;
     }
 
+    public function deleteWhereNotIn(string $field, array $values, string $provider)
+    {
+        return CreditPlan::where('provider', $provider)
+            ->whereNotIn($field, $values)
+            ->delete();
+    }
+
 
 
     /**
