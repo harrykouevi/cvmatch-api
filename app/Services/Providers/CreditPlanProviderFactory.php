@@ -8,6 +8,7 @@ class CreditPlanProviderFactory
     {
         return match ($provider) {
             'gumroad' => app(GumroadProductProvider::class),
+            'paddle' => app(PaddleProductProvider::class),
             // 'stripe' => app(StripeCreditPlanProvider::class),
 
             default => throw new \Exception("Unknown provider: {$provider}")

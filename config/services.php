@@ -48,5 +48,12 @@ return [
     'gumroad' => [
         'token' => env('GUMROAD_ACCESS_TOKEN'),
     ],
+    'paddle' => [
+
+        'base_url' => env('PADDLE_BASE_URL', 'https://api.paddle.com'),
+        'api_key' => env('PADDLE_API_KEY'),
+        // 'client_token' => env('PADDLE_CLIENT_TOKEN'),
+        'webhook_secret' => env('PADDLE_WEBHOOK_SECRET'),
+    ],
 
 ];

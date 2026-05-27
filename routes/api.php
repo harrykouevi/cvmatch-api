@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
-Route::get('/payements/gumroad', [PaymentsController::class, 'redirectToGumroad']);
 Route::post('/gumroad/webhook', [PaymentsController::class, 'handleGumroadWebhook'])->name('payments.webhooks.gumroad');
+// Route::get('/payment/success', function () {  return view('payment-success'); })->name('paddle.success');
+Route::get('/payment/success', function () { return redirect('http://localhost:5173/payement/callback'); })->name('paddle.success');
 
 
 Route::prefix('v1')->group(function () {
@@ -50,6 +51,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/analyses/{id}/download/resume', [AnalyseController::class, 'downloadResume'])->name('analyses.download.resume');
         //✔️
         Route::get('/analyses/{id}/download/cover-letter', [AnalyseController::class, 'downloadCoverLetter']);
+
+        Route::get('/payments/gumroad', [PaymentsController::class, 'redirectToGumroad']);
+        Route::post('/payments/paddle/checkout', [PaymentsController::class, 'createPaddleCheckout']);
+
 
     });
 

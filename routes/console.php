@@ -12,7 +12,7 @@ Artisan::command('inspire', function () {
 
 
 Schedule::call(function () {
-    foreach (['gumroad'] as $provider) {
+    foreach (['gumroad','paddle'] as $provider) {
         dispatch(new \App\Jobs\SyncProductProviderJob($provider));
     }
 })

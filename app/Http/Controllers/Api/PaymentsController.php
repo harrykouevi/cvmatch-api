@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 
 class PaymentsController extends Controller
@@ -93,6 +94,61 @@ class PaymentsController extends Controller
         return redirect("{$paylink}?wanted=true ");
     }
 
+    public function createPaddleCheckout(Request $request)
+    {
+        $request->validate([ 'price_id' => 'required|string']);
+        $user = $request->user();
+        $priceId = $request->price_id;
+
+        // sécurité : vérifier que le prix existe vraiment
+        // $allowedPrices = [
+        //     'pri_01hxxxxx',
+        //     'pri_01hyyyyy',
+        // ];
+
+        // if (!in_array($priceId, $allowedPrices)) {
+        //     return response()->json([
+        //         'message' => 'Invalid price'
+        //     ], 403);
+        // }
+
+        $response = Http::withToken(config('services.paddle.api_key'))
+            ->post('https://api.paddle.com/transactions', [
+                'items' => [
+                    [
+                        'price_id' => $request->price_id,
+                        'quantity' => 1
+                    ]
+                ],
+
+                'customer_email' => $user->email,
+                "collection_mode" => "automatic",
+
+                'custom_data' => [
+                    'user_id' => $user->id,
+                    'plan' => $request->plan_name,
+                ],
+
+                'checkout' => [
+                    'url' => route('paddle.success')
+                ]
+            ]);
+
+        if (!$response->successful()) {
+            return response()->json([
+                "message" => "Paddle transaction creation failed",
+                "error" => $response->json()
+            ], 500);
+        }
+
+        $data = $response->json();
+
+        return response()->json([
+            'checkout_url' => $data['data']['checkout']['url'] ?? null,
+            "transaction_id" => $data["data"]["id"] ?? null,
+        ]);
+    }
+
     public function handleGumroadWebhook(Request $request)
     {
         $data = $request->all();
@@ -161,6 +217,193 @@ class PaymentsController extends Controller
         $user = User::where('email', $data['email'])->first();
         $token = $user->createToken('api-token')->plainTextToken;
         return redirect("http://localhost:5173/payement/callback?token={$token}");
+    }
+
+    public function handlePAddleWebhook(Request $request)
+    {
+        // $data = $request->all();
+        // $saleId = $data['sale_id'] ?? null;
+
+        // $user = User::where('email', $data['email'])->first();
+        // $token = $user->createToken('api-token')->plainTextToken;
+
+        // if (!$saleId) {
+        //     return response()->json(['error' => 'Missing sale_id'], 400);
+        // }
+
+        // =========================
+        // RAW BODY
+        // =========================
+        $payload = $request->getContent();
+        $signature = $request->header('Paddle-Signature');
+
+        // =========================
+        // VERIFY SIGNATURE
+        // =========================
+        try {
+            $secret = config('services.paddle.webhook_secret');
+            if (!$signature) {
+                return response()->json([
+                    'error' => 'Missing signature'
+                ], 400);
+            }
+            $data = json_decode($payload, true);
+
+        } catch (\Exception $e) {
+            Log::error('Paddle webhook signature invalid', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'error' => 'Invalid signature'
+            ], 400);
+        }
+
+
+        $eventType = $data['event_type'] ?? null;
+
+        // =========================
+        // ONLY transaction.completed
+        // =========================
+        if ($eventType !== 'transaction.completed') {
+            return response()->json([
+                'message' => 'Event ignored'
+            ]);
+        }
+
+        // =========================
+        // TRANSACTION DATA
+        // =========================
+        $transaction = $data['data'] ?? null;
+
+        if (!$transaction) {
+            return response()->json([
+                'error' => 'Missing transaction data'
+            ], 400);
+        }
+
+        $transactionId = $transaction['id'] ?? null;
+
+        if (!$transactionId) {
+            return response()->json([
+                'error' => 'Missing transaction id'
+            ], 400);
+        }
+
+        $email = $transaction['customer']['email'] ?? null;
+        if (!$email) {
+            return response()->json([
+                'error' => 'Missing customer email'
+            ], 400);
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            Log::warning('User not found for Paddle payment', [
+                'email' => $email
+            ]);
+
+            return response()->json([
+                'error' => 'User not found'
+            ], 404);
+        }
+
+
+        $items = $transaction['items'] ?? [];
+
+        if (empty($items)) {
+            return response()->json([
+                'error' => 'No items'
+            ], 400);
+        }
+
+        DB::transaction(function () use (
+            $transaction,
+            $transactionId,
+            $items,
+            $user,
+            $data
+        ) {
+
+
+            $existingPayment = $this->paymentRepository->findByField( 'provider_payment_id',  $transactionId)->first() ;
+            if ($existingPayment && $existingPayment->status === 'paid') {
+                return;
+            }
+
+
+            $amount = $transaction['details']['totals']['grand_total'] ?? 0;
+            $amount = $amount / 100;
+
+            $payment = $this->paymentRepository->create([
+                'provider' => 'paddle',
+                'provider_payment_id' => $transactionId,
+                'user_id' => $user?->id,
+                'amount' => $amount,
+                'currency' => strtolower( $transaction['currency_code'] ?? 'usd'),
+                'status' => 'paid',
+                'paid_at' => now(),
+                'meta_json' => $data,
+            ]);
+
+            // =========================
+            // PROCESS ITEMS
+            // =========================
+            foreach ($items as $item) {
+
+                $priceId = $item['price']['id'] ?? null;
+                if (!$priceId) {
+                    continue;
+                }
+
+                $plan = $this->creditPlanRepository
+                        // ->findByField('provider_product_id', $data['product_id']);
+                        ->findByField('provider_price_id', $priceId)
+                    ->first();
+
+                if (!$plan) {
+                    Log::warning('Plan not found', [
+                        'price_id' => $priceId
+                    ]);
+                    continue;
+                }
+
+                // 3. sauvegarder achat
+                $this->purchaseRepository->create([
+                    'user_id' => $user?->id,
+                    'payment_id' => $payment->id,
+                    'product_type' => CreditPlan::class,
+                    'product_id' => $data['product_id'],
+                    'status' => 'paid',
+                    'amount' => $amount,
+                    'currency' => 'usd',
+                    'product_snapshot_json' => [
+                        'product_name' => $plan->name,
+                        'credits' => $plan->credits,
+                        'price' => $plan->price,
+                    ],
+                    'purchased_at' => now(),
+                ]);
+
+                // snapshot pricing
+                $snapshot = [
+                    'plan' => $plan->name,
+                    'credits' => $plan->credits,
+                    'price' => $plan->price,
+                ];
+
+                $this->addCredits(
+                    $user->id,
+                    $plan->credits,
+                    $payment->id,
+                    $snapshot
+                );
+            }
+        });
+
+        // $user = User::where('email', $data['email'])->first();
+        // $token = $user->createToken('api-token')->plainTextToken;
+        // return redirect("http://localhost:5173/payement/callback?token={$token}");
     }
 
     public function simulateWebhook(Request $request)

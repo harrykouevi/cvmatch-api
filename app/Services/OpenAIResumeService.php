@@ -114,7 +114,7 @@ class OpenAIResumeService
     {
         $prompt = $this->buildCleanTextPrompt($resumeText);
         try {
-             Log::info(["cleann nnnnnnnnn", env('SIMULATE_AI',false)]);
+            Log::info(["cleann nnnnnnnnn", env('SIMULATE_AI',false)]);
             if(env('SIMULATE_AI',false) == false){
                 $response = $this->client->post('responses', [
                     'headers' => [

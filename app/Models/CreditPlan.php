@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -30,6 +31,7 @@ class CreditPlan extends Model implements Transformable
         'is_active' ,
         'provider',
         'provider_product_id',
+        'provider_price_id',
         'provider_product_snapshot_json' ,
         'synced_at',
     ];
@@ -58,22 +60,52 @@ class CreditPlan extends Model implements Transformable
 
     public function getCustomUiAttribute()
     {
-        $snapshot = json_decode($this->provider_product_snapshot_json, true);
-        $description = $snapshot['description'] ?? '';
-        $features = $this->extractFeaturesFromDescription($description);
+        if($this->provider == "gumroad"){
+            $snapshot = json_decode($this->provider_product_snapshot_json, true);
+            $description = $snapshot['description'] ?? '';
+            $features = $this->extractFeaturesFromDescription($description);
 
-        return [
-            'name' => $snapshot['name'] ?? null,
-            'price' => isset($snapshot['formatted_price'])
-                ? $snapshot['formatted_price']
-                : ('$' . (($snapshot['price'] ?? 0) / 100)),
-            // 'subtitle' => $snapshot['custom_summary'] ?? null,
-            'subtitle' => $this->buildSubtitleFromFeatures( $features),
-            'badge' => 'Best for testing',
-            'features' => $this->buildSymplifyFeatures( $features),
-            'cta' => 'Unlock for ' . ($snapshot['formatted_price'] ?? '$5'),
-            'url' => $snapshot['short_url'] ?? null,
-        ];
+            return [
+                'id' =>  $this->id,
+                'name' => $snapshot['name'] ?? null,
+                'provider' => $this->provider ?? null,
+                'price' => isset($snapshot['formatted_price'])
+                    ? $snapshot['formatted_price']
+                    : ('$' . (($snapshot['price'] ?? 0) / 100)),
+                // 'subtitle' => $snapshot['custom_summary'] ?? null,
+                'subtitle' => $this->buildSubtitleFromFeatures( $features),
+                'badge' => 'Best for testing',
+                'features' => $this->buildSymplifyFeatures( $features),
+                'cta' => 'Unlock for ' . ($snapshot['formatted_price'] ?? '$5'),
+                'url' => $snapshot['short_url'] ?? null,
+            ];
+        }
+
+        if($this->provider == "paddle"){
+            $snapshot = json_decode($this->provider_product_snapshot_json, true);
+            $description = $snapshot['description'] ?? '';
+            $customData = $snapshot['custom_data'] ?? [];
+            Log::info('first one',[$customData]);
+            $features = $customData['features'] ?? [];
+            if (is_string($features)) {
+                $features = json_decode($features, true)?? [];
+            }
+            $features = $this->buildSymplifyFeatures($this->prepareFeaturesFromPaddle($features));
+
+            return [
+                'id' => $this->id,
+                'name' => $this->name ?? null,
+                'provider' => $this->provider ?? null,
+                'price_id' => $this->provider_price_id,
+                'price' => $this->price ? ('$' . (($this->price ?? 0) / 100)) : null,
+                'subtitle' => $snapshot['description'] ?? null,
+                'badge' =>  $customData['badge'] ?? null,
+                'features' => $features,
+                'description' => $customData['details'] ?? null,
+                'cta' => 'Unlock for ' . ('$' .(($this->price ?? 0) / 100) ?? '$5') ,
+                'url' => $snapshot['short_url'] ?? null,
+            ];
+        }
     }
 
     private function extractFeaturesFromDescription(string $html): array
@@ -92,6 +124,58 @@ class CreditPlan extends Model implements Transformable
 
         $features = [];
 
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            // stop condition
+            if ($line === '' || str_starts_with($line, 'Perfect if')) {
+                break;
+            }
+
+            // split bullets inside same line
+            $parts = preg_split('/(•|\-|\+|✓|✔|\x{2022})/u', $line);
+
+            foreach ($parts as $part) {
+                $part = trim($part);
+
+                if ($part === '') {
+                    continue;
+                }
+
+                // extract quantity
+                if (preg_match('/^(\d+)\s+(.*)$/', $part, $matches)) {
+                    $features[] = [
+                        'qty' => (int) $matches[1],
+                        'text' => (int) $matches[1] .' '.trim($matches[2]),
+                    ];
+                } else {
+                    $features[] = [
+                        'qty' => Null,
+                        'text' => $part, // ✅ FIX
+                    ];
+                }
+            }
+        }
+
+        return $features;
+    }
+
+    private function prepareFeaturesFromPaddle(array $json): array
+    {
+        // $text = html_entity_decode(strip_tags($json));
+
+        // if (!str_contains($text, 'This pack includes')) {
+        //     return [];
+        // }
+
+        // $after = explode('This pack includes:', $text)[1] ?? '';
+
+        // dd($after) ;
+
+        // $lines = preg_split('/\r\n|\r|\n/', $after);
+
+        $features = [];
+        $lines = $json ;
         foreach ($lines as $line) {
             $line = trim($line);
 

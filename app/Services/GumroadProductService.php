@@ -22,7 +22,6 @@ class GumroadProductService
             'timeout' => 90,
         ]);
 
-        $this->apiKey = config('services.openai.key');
         $this->creditPlanRepository = $creditPlanRepository;
     }
 
