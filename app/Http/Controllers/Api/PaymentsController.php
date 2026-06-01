@@ -79,6 +79,27 @@ class PaymentsController extends Controller
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
+
+
+
+
+        // =====================================================
+        // IDEMPOTENCY EVENT CHECK //
+        // =====================================================
+        // $eventId = $event->id; if ( \App\Models\StripeEvent::where('event_id', $eventId)->exists() ) {
+        //     return response()->json([ 'message' => 'Event already processed' ]);
+        // }
+        // =====================================================
+        // 5. IDEMPOTENCY CHECK (avoid double processing)
+        // =====================================================
+        // $existing = $this->paymentRepository
+        //     ->findByField('provider_payment_id', $paymentIntentId)
+        //     ->first();
+
+        // if ($existing && $existing->status === 'paid') {
+        //     return response()->json(['message' => 'Already processed']);
+        // }
+
         // =====================================================
         // 2. ONLY HANDLE REQUIRED EVENT
         // =====================================================
@@ -86,80 +107,99 @@ class PaymentsController extends Controller
             return response()->json(['message' => 'Event ignored']);
         }
 
-        // =====================================================
+         // =====================================================
         // 3. EXTRACT SESSION
         // =====================================================
         $session = $event->data->object;
 
-        $paymentIntentId = $session->payment_intent ?? null;
-        $email = $session->customer_details->email ?? null;
-
-        if (!$paymentIntentId || !$email) {
-            return response()->json([
-                'error' => 'Missing payment intent or email'
-            ], 400);
+         // =====================================================
+        // 4. VERIFY PAYMENT STATUS
+        // =====================================================
+        if (($session->payment_status ?? null) !== 'paid') {
+            return response()->json(['message' => 'Payment not completed']);
         }
+
+        // $paymentIntentId = $session->payment_intent ?? null;
+        // $email = $session->customer_details->email ?? null;
+
+        // if (!$paymentIntentId || !$email) {
+        //     return response()->json([
+        //         'error' => 'Missing payment intent or email'
+        //     ], 400);
+        // }
 
         // =====================================================
         // 4. FIND USER
         // =====================================================
-        $user = User::where('email', $email)->first();
+         $userId = $session->metadata->user_id ?? null;
+        if (!$userId) {
+            Log::error('Stripe webhook missing user_id metadata');
+            return response()->json(['error' => 'Missing user_id'], 400);
+        }
+        $user = User::find($userId);
 
         if (!$user) {
             Log::warning('Stripe webhook: user not found', [
-                'email' => $email
+                'user_id' => $userId
             ]);
 
             return response()->json(['error' => 'User not found'], 404);
         }
 
+         // =====================================================
+        // 6. STRIPE CLIENT (OUTSIDE TRANSACTION)
         // =====================================================
-        // 5. IDEMPOTENCY CHECK (avoid double processing)
-        // =====================================================
-        $existing = $this->paymentRepository
-            ->findByField('provider_payment_id', $paymentIntentId)
-            ->first();
+        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
 
-        if ($existing && $existing->status === 'paid') {
-            return response()->json(['message' => 'Already processed']);
+        try {
+            $items = $stripe->checkout->sessions->allLineItems($session->id)->data;
+        } catch (\Exception $e) {
+            Log::error('Stripe line items error', [
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['error' => 'Stripe error'], 500);
         }
+
+
+
+
 
         // =====================================================
         // 6. PROCESS PAYMENT (DB TRANSACTION SAFE)
         // =====================================================
-        DB::transaction(function () use ($session, $paymentIntentId, $user, $event) {
+        DB::transaction(function () use ($session, $user, $event, $items) {
 
             // Stripe amount is in cents
             $amount = ($session->amount_total ?? 0) / 100;
 
+            // -------------------------------------------------
+            // CHECK DUPLICATE PAYMENT
+            // -------------------------------------------------
+            $existingPayment = $this->paymentRepository
+                ->findByField('provider_payment_id', $session->payment_intent)
+                ->first();
+
+            if ($existingPayment && $existingPayment->status === 'paid') {
+                return;
+            }
+
+
             // Create payment record
             $payment = $this->paymentRepository->create([
                 'provider' => 'stripe',
-                'provider_payment_id' => $paymentIntentId,
+                'provider_payment_id' => $session->payment_intent,
                 'user_id' => $user->id,
                 'amount' => $amount,
                 'currency' => strtolower($session->currency ?? 'usd'),
                 'status' => 'paid',
                 'paid_at' => now(),
-                'meta_json' => json_decode(json_encode($event), true),
+                // 'meta_json' => json_decode(json_encode($event), true),
+                'meta_json' => [
+                    'stripe_event_id' => $event->id,
+                    'stripe_session_id' => $session->id,
+                ],
             ]);
 
-            // =================================================
-            // 7. GET STRIPE LINE ITEMS
-            // =================================================
-            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-
-            $items = [];
-
-            try {
-                $items = $stripe->checkout->sessions->allLineItems(
-                    $session->id
-                )->data;
-            } catch (\Exception $e) {
-                Log::error('Stripe line items error', [
-                    'error' => $e->getMessage()
-                ]);
-            }
 
             // =================================================
             // 8. PROCESS ITEMS → CREDITS
@@ -258,6 +298,7 @@ class PaymentsController extends Controller
             ]],
 
             "metadata" => [
+                "user_id" => $user->id,
                 "product_id" => $product["id"],
                 "credits" => $product["credits"],
                 'user_currency' => "usd",

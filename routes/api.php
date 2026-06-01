@@ -16,7 +16,8 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 
 Route::post('/gumroad/webhook', [PaymentsController::class, 'handleGumroadWebhook'])->name('payments.webhooks.gumroad');
 // Route::get('/payment/success', function () {  return view('payment-success'); })->name('paddle.success');
-Route::get('/payment/success', function () { return redirect('http://localhost:5173/payement/callback'); })->name('paddle.success');
+// Route::get('/payment/success', function () { return redirect('http://localhost:5173/payement/callback'); })->name('paddle.success');
+Route::post('/payments/stripe/webhook', [PaymentsController::class, 'handleStripeWebhook']);
 
 
 Route::prefix('v1')->group(function () {
