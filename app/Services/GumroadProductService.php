@@ -34,6 +34,15 @@ class GumroadProductService
             return ;
         }
 
+        $ProductIds = [];
+        $PriceIds = [];
+
+        foreach ($products as $product) {
+            $ProductIds[] = $product['id'];
+        }
+        $ProductIds = array_unique($ProductIds);
+
+
         $synced = [];
 
 
@@ -56,17 +65,18 @@ class GumroadProductService
             );
         }
 
-        // return $synced;
-    }
+        /**
+         * 3. SUPPRESSION des produits qui n'existent plus chez gumroad
+         */
 
-    private function extractCredits(array $product): int
-    {
-        return match ($product['price']) {
-            1000 => 100,
-            2000 => 250,
-            5000 => 700,
-            default => 0,
-        };
+        // a) supprimer produits orphelins
+        $this->creditPlanRepository->deleteWhereNotIn(
+            'provider_product_id',
+            $ProductIds,
+            'gumroad'
+        );
+
+        // return $synced;
     }
 
     private function listProducts()

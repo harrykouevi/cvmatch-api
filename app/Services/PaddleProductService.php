@@ -38,16 +38,6 @@ class PaddleProductService
             return ;
         }
 
-
-        Log::info('list of products',[
-            '$products' => $products,
-        ]);
-
-
-        Log::info('list of products', [
-            'products_count' => count($products),
-        ]);
-
         /**
          * 1. Construire les IDs Paddle existants
          */
@@ -104,7 +94,7 @@ class PaddleProductService
                     ],
                     [
                         'name' => $product['name'],
-                        'price' => $price['unit_price']['amount'] ?? 0001,
+                        'price' => $price['unit_price']['amount'] ?? 0,
                         'currency' => $price['unit_price']['currency_code'] ?? 'usd',
                         'provider_product_snapshot_json' => json_encode($product),
                         'is_active' => $product['status'] === 'active' && ($price['status'] ?? 'a') === 'active',

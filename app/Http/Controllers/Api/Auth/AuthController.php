@@ -8,9 +8,11 @@ use App\Http\Resources\UserProfileResource;
 use App\Repositories\Interfaces\AnalyseRepository;
 use App\Repositories\Interfaces\ResumeRepository;
 use App\Repositories\Interfaces\UserRepository;
+use Exception;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -49,85 +51,110 @@ class AuthController extends ApiController
         return $this->sendResponse( new UserProfileResource($user), __('lang.data_fetched_successfully', ['operator' => __('lang.resume')]));
     }
 
+    public function acceptTerms(Request $request)
+    {
+        try {
+            $user = Auth::user() ?? $request->attributes->get('current_user');
+            if (!$user) {
+                throw new Exception("User not authenticated");
+            }
+
+            $user->update([
+                'terms_accepted' => true,
+                'terms_accepted_at' => now(),
+            ]);
+
+            // $user = $user->loadProfileData();
+
+        } catch (Exception $e) {
+            Log::error("Error updated user: " . $e->getMessage());
+            return $this->sendError($e->getMessage(), 500);
+        }
+
+
+        return $this->sendResponse( [], __('lang.saved_successfully', ['operator' => __('lang.auth')]));
+
+    }
+
     public function redirectToGoogle(Request $request)
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        // return Socialite::driver('google')->stateless()->redirect();
 
 
-        // $guestToken = request('guest_token');
-        // $guestUser = Null ;
-        // if ($guestToken) {
-        //     $guestUser = $this->userRepository->findWhere([
-        //         'guest_token' => $guestToken,
-        //         'is_guest' => true,
-        //     ])->first();
-        // }
+        $guestToken = request('guest_token');
+        $guestUser = Null ;
+        if ($guestToken) {
+            $guestUser = $this->userRepository->findWhere([
+                'guest_token' => $guestToken,
+                'is_guest' => true,
+            ])->first();
+        }
 
-        // $existingUser = $this->userRepository->findByField('email', 'harry.kouevi@gmail.com')->first();
+        $existingUser = $this->userRepository->findByField('email', 'harry.kouevi@gmail.com')->first();
 
-        // if ($existingUser) {
-        //     if ($guestUser) {
+        if ($existingUser) {
+            if ($guestUser) {
 
-        //         Log::error(['guestUser is doing fusion']) ;
+                Log::error(['guestUser is doing fusion']) ;
 
-        //         $analyses = $this->analyseRepository->findByField('user_id', $guestUser->id);
-        //         Log::error(['analyse count',$analyses->count()])  ;
-        //         foreach ($analyses as $analyse) {
-        //             $analyse->update([
-        //                 'user_id' => $existingUser->id
-        //             ]);
-        //         }
+                $analyses = $this->analyseRepository->findByField('user_id', $guestUser->id);
+                Log::error(['analyse count',$analyses->count()])  ;
+                foreach ($analyses as $analyse) {
+                    $analyse->update([
+                        'user_id' => $existingUser->id
+                    ]);
+                }
 
-        //         $resumes = $this->resumeRepository->findByField('user_id', $guestUser->id) ;
-        //         Log::error(['$resumes count',$resumes->count()])  ;
+                $resumes = $this->resumeRepository->findByField('user_id', $guestUser->id) ;
+                Log::error(['$resumes count',$resumes->count()])  ;
 
-        //         foreach ($resumes as $analyse) {
-        //             $analyse->update([
-        //                 'user_id' => $existingUser->id
-        //             ]);
-        //         }
-        //         // supprimer guest
-        //         $guestUser->delete();
-        //     }
+                foreach ($resumes as $analyse) {
+                    $analyse->update([
+                        'user_id' => $existingUser->id
+                    ]);
+                }
+                // supprimer guest
+                $guestUser->delete();
+            }
 
-        // }else{
+        }else{
 
-        //      /**
-        //      * CAS 2 :
-        //      * convertir le guest en vrai compte
-        //      */
-        //     if ($guestUser) {
+             /**
+             * CAS 2 :
+             * convertir le guest en vrai compte
+             */
+            if ($guestUser) {
 
-        //         $this->userRepository->update([
-        //             'name' => 'harry.kouevi',
-        //             'email' => 'harry.kouevi@gmail.com',
-        //             'password' => bcrypt(str()->random(16)),
-        //             'is_guest' => false,
-        //             'guest_token' => null,
-        //         ], $guestUser->id);
+                $this->userRepository->update([
+                    'name' => 'harry.kouevi',
+                    'email' => 'harry.kouevi@gmail.com',
+                    'password' => bcrypt(str()->random(16)),
+                    'is_guest' => false,
+                    'guest_token' => null,
+                ], $guestUser->id);
 
-        //         $existingUser = $guestUser;
+                $existingUser = $guestUser;
 
-        //     } else {
+            } else {
 
-        //          /**
-        //          * CAS 3 :
-        //          * aucun guest
-        //          */
-        //         $existingUser = $this->userRepository->create([
-        //             'name' => 'harry.kouevi',
-        //             'email' => 'harry.kouevi@gmail.com',
-        //             'password' => bcrypt(str()->random(16)),
-        //             'is_guest' => false,
-        //             'guest_token' => null,
-        //         ]);
-        //     }
-        // }
+                 /**
+                 * CAS 3 :
+                 * aucun guest
+                 */
+                $existingUser = $this->userRepository->create([
+                    'name' => 'harry.kouevi',
+                    'email' => 'harry.kouevi@gmail.com',
+                    'password' => bcrypt(str()->random(16)),
+                    'is_guest' => false,
+                    'guest_token' => null,
+                ]);
+            }
+        }
 
 
-        // $token = $existingUser->createToken('api-token')->plainTextToken;
-        // $token = urlencode($token) ;
-        // return redirect("http://localhost:5173/auth/callback?token={$token}");
+        $token = $existingUser->createToken('api-token')->plainTextToken;
+        $token = urlencode($token) ;
+        return redirect("http://localhost:5173/auth/callback?token={$token}");
     }
 
     public function handleGoogleCallback(Request $request)

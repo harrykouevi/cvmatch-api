@@ -12,9 +12,9 @@ Artisan::command('inspire', function () {
 
 
 Schedule::call(function () {
-    foreach (['gumroad','paddle'] as $provider) {
-        dispatch(new \App\Jobs\SyncProductProviderJob($provider));
-    }
+    // foreach (['gumroad','paddle'] as $provider) {
+    //     dispatch(new \App\Jobs\SyncProductProviderJob($provider));
+    // }
 })
 // ->everyFiveSeconds();
 ->everyMinute();

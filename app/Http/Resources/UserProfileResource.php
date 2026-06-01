@@ -28,7 +28,7 @@ class UserProfileResource extends JsonResource
 
             return [
                 ...$u ,
-
+                'has_accepted_terms' => $this->has_accepted_terms,
                 'credits' => [
                     'remaining' => $this->credit?->balance ?? 0,
                     'used' => $this->credit?->used ?? 0,

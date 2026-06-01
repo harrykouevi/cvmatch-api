@@ -3,7 +3,6 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +10,6 @@ use Spatie\Permission\Traits\HasRoles;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
-// use Laravel\Passport\HasApiTokens;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
 
@@ -40,7 +38,9 @@ class User extends Authenticatable implements HasMedia
         'email',
         'password',
         'is_guest',
-        'guest_token'
+        'guest_token',
+        'terms_accepted' ,
+        'terms_accepted_at'
     ];
 
      /**
@@ -70,8 +70,26 @@ class User extends Authenticatable implements HasMedia
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'terms_accepted' => 'boolean',
+            'terms_accepted_at' => 'datetime',
         ];
     }
+
+    /**
+     * Appended attributes.
+     */
+    protected $appends = [
+        'has_accepted_terms',
+    ];
+
+    /**
+     * Accessor: has_accepted_terms
+     */
+    public function getHasAcceptedTermsAttribute(): bool
+    {
+        return (bool) $this->terms_accepted;
+    }
+
 
     public function loadProfileData(): self
     {
@@ -93,20 +111,7 @@ class User extends Authenticatable implements HasMedia
                 ->latest()
                 ->limit(5);
             },
-            // 'resumes' => function ($q) {
 
-            //     $q->select(
-            //         'id',
-            //         'user_id',
-            //         'type',
-            //         'credits',
-            //         'balance_after',
-            //         'description',
-            //         'created_at'
-            //     )
-            //     ->latest()
-            //     ->limit(5);
-            // }
         ])->loadCount('resumes')->loadCount('analyses');
 
     }

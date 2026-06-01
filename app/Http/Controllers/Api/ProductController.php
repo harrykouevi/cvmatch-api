@@ -9,6 +9,8 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Prettus\Repository\Criteria\RequestCriteria;
+use Prettus\Repository\Exceptions\RepositoryException;
+
 
 class ProductController extends Controller
 {
@@ -39,13 +41,39 @@ class ProductController extends Controller
         }
         $products = $this->creditPlanRepository->scopeQuery(function ($query) {
             return $query->where('is_active', true)
-                        ->where('credits', '>', 0)
+                        // ->where('credits', '>', 0)
                         ->orderBy('price', 'asc'); ;
         })->get();
 
 
         return $this->sendResponse( $products->toArray(),'plan get successfully'  );
 
+    }
+
+    public function show(int $id, Request $request): JsonResponse
+    {
+
+        try {
+            $this->creditPlanRepository->pushCriteria(new RequestCriteria($request));
+            $this->creditPlanRepository->pushCriteria(new LimitOffsetCriteria($request));
+            $product = $this->creditPlanRepository->findWhere([
+                'id' => $id
+            ])
+            ->first();
+            if (empty($product)) {
+                return $this->sendError('Analyse not found');
+            }
+
+        } catch (RepositoryException $e) {
+            return $this->sendError($e->getMessage());
+        }
+
+
+
+        return $this->sendResponse(
+            $product,
+            'product retrieved successfully'
+        );
     }
 
 }

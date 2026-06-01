@@ -23,6 +23,7 @@ Route::prefix('v1')->group(function () {
 
     // GET /api/credit-plans✔️
     Route::get('/credit-plans', [ProductController::class, 'index'])->name('credit-plans.index');
+    Route::get('/credit-plans/{id}', [ProductController::class, 'show'])->name('credit-plans.show');
 
     Route::post('/mobile-waitlist', [MobileWaitlistController::class, 'store'])->name('mobile-waitlist.store');
     // POST /api/resumes/upload ✔️
@@ -47,14 +48,15 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/auth/accept-terms', [AuthController::class, 'acceptTerms']);
+
         Route::get('/analyses/{id}/unlock', [AnalyseController::class, 'unlockFullResult'])->name('analyses.unlock');
         Route::get('/analyses/{id}/download/resume', [AnalyseController::class, 'downloadResume'])->name('analyses.download.resume');
-        //✔️
         Route::get('/analyses/{id}/download/cover-letter', [AnalyseController::class, 'downloadCoverLetter']);
 
         Route::get('/payments/gumroad', [PaymentsController::class, 'redirectToGumroad']);
+        Route::post('/payments/stripe/session', [PaymentsController::class, 'createStripeSession']);
         Route::post('/payments/paddle/checkout', [PaymentsController::class, 'createPaddleCheckout']);
-
 
     });
 

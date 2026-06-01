@@ -12,10 +12,14 @@ use App\Repositories\Interfaces\PaymentRepository;
 use App\Repositories\Interfaces\PurchaseRepository;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
+use Stripe\Webhook;
 
 
 class PaymentsController extends Controller
@@ -52,38 +56,224 @@ class PaymentsController extends Controller
         parent::__construct();
     }
 
-
     public function handleStripeWebhook(Request $request)
     {
-        $sessionId = $request->data['object']['id'];
+        $payload = $request->getContent();
+        $sigHeader = $request->header('Stripe-Signature');
+        $endpointSecret = config('services.stripe.webhook_secret');
 
-        //$payment = Payment::where('stripe_session_id', $sessionId)->first();
-        $payment = $this->paymentRepository->findWhere(['stripe_session_id', $sessionId]);
-        $payment = $this->paymentRepository->findByField('stripe_session_id', $sessionId);
+        // =====================================================
+        // 1. VERIFY STRIPE SIGNATURE
+        // =====================================================
+        try {
+            $event = Webhook::constructEvent(
+                $payload,
+                $sigHeader,
+                $endpointSecret
+            );
+        } catch (\Exception $e) {
+            Log::error('Stripe webhook invalid signature', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json(['error' => 'Invalid signature'], 400);
+        }
+
+        // =====================================================
+        // 2. ONLY HANDLE REQUIRED EVENT
+        // =====================================================
+        if ($event->type !== 'checkout.session.completed') {
+            return response()->json(['message' => 'Event ignored']);
+        }
+
+        // =====================================================
+        // 3. EXTRACT SESSION
+        // =====================================================
+        $session = $event->data->object;
+
+        $paymentIntentId = $session->payment_intent ?? null;
+        $email = $session->customer_details->email ?? null;
+
+        if (!$paymentIntentId || !$email) {
+            return response()->json([
+                'error' => 'Missing payment intent or email'
+            ], 400);
+        }
+
+        // =====================================================
+        // 4. FIND USER
+        // =====================================================
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            Log::warning('Stripe webhook: user not found', [
+                'email' => $email
+            ]);
+
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        // =====================================================
+        // 5. IDEMPOTENCY CHECK (avoid double processing)
+        // =====================================================
+        $existing = $this->paymentRepository
+            ->findByField('provider_payment_id', $paymentIntentId)
+            ->first();
+
+        if ($existing && $existing->status === 'paid') {
+            return response()->json(['message' => 'Already processed']);
+        }
+
+        // =====================================================
+        // 6. PROCESS PAYMENT (DB TRANSACTION SAFE)
+        // =====================================================
+        DB::transaction(function () use ($session, $paymentIntentId, $user, $event) {
+
+            // Stripe amount is in cents
+            $amount = ($session->amount_total ?? 0) / 100;
+
+            // Create payment record
+            $payment = $this->paymentRepository->create([
+                'provider' => 'stripe',
+                'provider_payment_id' => $paymentIntentId,
+                'user_id' => $user->id,
+                'amount' => $amount,
+                'currency' => strtolower($session->currency ?? 'usd'),
+                'status' => 'paid',
+                'paid_at' => now(),
+                'meta_json' => json_decode(json_encode($event), true),
+            ]);
+
+            // =================================================
+            // 7. GET STRIPE LINE ITEMS
+            // =================================================
+            $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
+
+            $items = [];
+
+            try {
+                $items = $stripe->checkout->sessions->allLineItems(
+                    $session->id
+                )->data;
+            } catch (\Exception $e) {
+                Log::error('Stripe line items error', [
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            // =================================================
+            // 8. PROCESS ITEMS → CREDITS
+            // =================================================
+            foreach ($items as $item) {
+
+                $priceId = $item->price->id ?? null;
+
+                if (!$priceId) {
+                    continue;
+                }
+
+                $plan = $this->creditPlanRepository
+                    ->findByField('provider_price_id', $priceId)
+                    ->first();
+
+                if (!$plan) {
+                    Log::warning('Stripe webhook: plan not found', [
+                        'price_id' => $priceId
+                    ]);
+                    continue;
+                }
+
+                // Create purchase
+                $this->purchaseRepository->create([
+                    'user_id' => $user->id,
+                    'payment_id' => $payment->id,
+                    'product_type' => CreditPlan::class,
+                    'product_id' => $plan->id,
+                    'status' => 'paid',
+                    'amount' => $amount,
+                    'currency' => strtolower($session->currency ?? 'usd'),
+                    'product_snapshot_json' => [
+                        'product_name' => $plan->name,
+                        'credits' => $plan->credits,
+                        'price' => $plan->price,
+                    ],
+                    'purchased_at' => now(),
+                ]);
+
+                // Add credits
+                $this->addCredits(
+                    $user->id,
+                    $plan->credits,
+                    $payment->id,
+                    [
+                        'plan' => $plan->name,
+                        'credits' => $plan->credits,
+                        'price' => $plan->price,
+                    ]
+                );
+            }
+        });
+
+        // =====================================================
+        // 9. SUCCESS RESPONSE
+        // =====================================================
+        return response()->json(['status' => 'success']);
+    }
 
 
-        if (!$payment) return;
+    public function createStripeSession(Request $request)
+    {
 
-        if ($payment->status === 'paid') return; // éviter double crédit
+        $user = Auth::user() ;
+        if (!$user) {
+            return $this->sendError('User not authenticated', 401);
+        }
 
-        $this->paymentRepository->update(['status' => 'paid'],$payment->id);
+        $this->validate($request, [
+            'product_id' => 'required',
+        ]);
+
+        $productId = $request->product_id;
+        $product = $this->creditPlanRepository->find( $productId );
+        Log::info($product) ;
+        if (!$product) {
+            $this->sendError("Product not found", 404);
+        }
+
+        Stripe::setApiKey(config("services.stripe.secret"));
+
+        $session = Session::create([
+            "payment_method_types" => ["card"],
+            "mode" => "payment",
+
+            "line_items" => [[
+                "price_data" => [
+                    "currency" => "usd",
+                    "product_data" => [
+                        "name" => $product["name"],
+                    ],
+                    "unit_amount" => $product["price"],
+                ],
+                "quantity" => 1,
+            ]],
+
+            "metadata" => [
+                "product_id" => $product["id"],
+                "credits" => $product["credits"],
+                'user_currency' => "usd",
+            ],
+
+            "success_url" => "http://localhost:5173/payement/success?session_id={CHECKOUT_SESSION_ID}",
+            "cancel_url" => "http://localhost:5173/payement/cancel",
+        ]);
 
 
-        $plan = $this->creditPlanRepository->findByField('name', $payment->plan);
 
-        // snapshot pricing
-        $snapshot = [
-            'plan' => $plan->name,
-            'credits' => $plan->credits,
-            'price' => $plan->price,
-        ];
+        return $this->sendResponse([
+            "session_id" => $session->id,
+            "url" => $session->url
+        ], __('lang.saved_successfully', ['operator' => __('lang.session_stripe')]));
 
-        $this->addCredits(
-            $payment->user_email,
-            $plan->credits,
-            $payment->id,
-            $snapshot
-        );
     }
 
 

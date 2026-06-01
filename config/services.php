@@ -55,5 +55,10 @@ return [
         // 'client_token' => env('PADDLE_CLIENT_TOKEN'),
         'webhook_secret' => env('PADDLE_WEBHOOK_SECRET'),
     ],
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'key' => env('STRIPE_KEY'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
 
 ];

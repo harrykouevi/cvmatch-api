@@ -87,13 +87,14 @@ class ResumeController extends Controller
 
             $input['original_file_name'] = $file->getClientOriginalName();
             $input['file_type'] = $file->getClientMimeType();
+            $input[ 'extracted_text'] = $this->extractText($file) ;
+
 
             $resume = $this->resumeRepository->update($input, $resume->id);
 
-            event(new AiCleanTextEvent(
-                $resume,
-                $this->extractText($file)
-            ));
+
+            //a cet etape pas de cleaning
+            //event(new AiCleanTextEvent( $resume, $this->extractText($file)));
 
             $this->uploadRepository->createWithMedia(
                 $file,
@@ -106,7 +107,6 @@ class ResumeController extends Controller
         }
 
         $resume->load('media');
-
         return $resume;
     }
 

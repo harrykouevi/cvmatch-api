@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Analyse;
+use App\Models\Resume;
 use App\Repositories\Interfaces\AnalyseRepository;
 use App\Services\OpenAIResumeService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -47,7 +48,6 @@ class AiPerformJob implements ShouldQueue
         $lock = Cache::lock($lockKey, 600);
         if (! $lock->get()) {
             Log::info('AI job already running', ['analyse_id' => $analyseId]);
-            // $analyse->update(['status' => 'pending']);
             return;
         }
 
@@ -67,23 +67,23 @@ class AiPerformJob implements ShouldQueue
             }
 
 
-            $resumeText = $analyse->resume?->extracted_text  ?? null;
-
+            $resumeText = $analyse->resume?->extracted_text ;
+            // $resumeText = $analyse->resume?->extracted_text  ?? null;
             // =====================================================
             // RETRY SAFE WAIT (DEPENDENCY: extract text job)
             // =====================================================
-             if (blank($resumeText)) {
-                Log::info('Waiting for extracted_text generation', [ 'analyse_id' => $analyse?->id,'attempt' => $this->attempts(), ]);
-                if ($this->attempts() >= $this->tries) {
-                    Log::error('Resume text still empty after max retries', [ 'analyse_id' => $analyseId, ]);
-                    $analyse->update([ 'status' => 'failed', ]);
-                    return;
-                }
+            //  if (blank($resumeText)) {
+            //     Log::info('Waiting for extracted_text generation', [ 'analyse_id' => $analyse?->id,'attempt' => $this->attempts(), ]);
+            //     if ($this->attempts() >= $this->tries) {
+            //         Log::error('Resume text still empty after max retries', [ 'analyse_id' => $analyseId, ]);
+            //         $analyse->update([ 'status' => 'failed', ]);
+            //         return;
+            //     }
 
-                $analyse->update([ 'status' => 'pending', ]);
-                $this->release(15);
-                return;
-            }
+            //     $analyse->update([ 'status' => 'pending', ]);
+            //     $this->release(15);
+            //     return;
+            // }
 
             if (blank($analyse->job_description)) {
                 Log::error('Job description empty', [ 'analyse_id' => $analyse->id,]);
@@ -146,9 +146,11 @@ class AiPerformJob implements ShouldQueue
                 "optimized_resume_analysis_json" => $aiData['optimized_resume_analysis'] ?? [],
             ] ;
 
-             Analyse::where('id', $analyse->id)
+            Analyse::where('id', $analyse->id)
                 ->where('status', 'processing')
                 ->update($data) ;
+
+            Resume::where('id', $analyse->resume->id)->update(['extracted_text'=>  $aiData["original_resume"]["text_clean"] ]);
             // $analyseRepository->update($data,$analyseId);
             Log::info('AI analysis completed successfully', [ 'analyse_id' => $analyseId,]);
         } catch (\Throwable $e) {

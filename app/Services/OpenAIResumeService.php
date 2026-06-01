@@ -24,7 +24,7 @@ class OpenAIResumeService
 
     public function analyze(string $resumeText, string $jobDescription): array
     {
-        $prompt = $this->buildPrompt($resumeText, $jobDescription);
+        $prompt = $this->buildCleanTextAnalysePrompt($resumeText, $jobDescription);
         try {
             Log::info(["nnnnnnnnn", env('SIMULATE_AI',false)]);
             // =====================================================
@@ -189,6 +189,170 @@ class OpenAIResumeService
             {
 
             "original_resume": {
+                "overall_ats_score": 0,
+                "match_level": "",
+                "job_fit_summary": "",
+                "scoring_breakdown": {
+                    "keyword_match": 0,
+                    "skills_alignment": 0,
+                    "experience_relevance": 0,
+                    "resume_structure": 0,
+                    "ats_readability": 0,
+                    "achievement_quality": 0
+                },
+                "missing_keywords": [],
+                "missing_hard_skills": [],
+                "weak_sections": [],
+                "strong_points": [],
+                "detected_problems": [],
+                "recruiter_risk_flags": []
+            },
+
+            "optimized_resume_analysis": {
+                "overall_ats_score": 0,
+                "score_improvement": 0,
+                "scoring_breakdown": {
+                    "keyword_match": 0,
+                    "skills_alignment": 0,
+                    "experience_relevance": 0,
+                    "resume_structure": 0,
+                    "ats_readability": 0,
+                    "achievement_quality": 0
+                },
+                "improvements_made": [],
+                "keywords_added": [],
+                "recruiter_impression": "",
+                "remaining_weaknesses": []
+            }
+
+            "optimized_resume": "",
+            "optimized_resume_array": {
+                "full_name": "",
+                "headline": "",
+                "professional_summary": "",
+                "skills": [],
+                "professional_experience": [],
+                "education": [],
+                "certifications": [],
+                "projects": [],
+                "languages": []
+            },
+            "cover_letter": "",
+            "recommendations": [],
+            "warnings": []
+            }
+
+
+            Scoring Rules:
+            - Scores must be realistic and conservative
+
+            - ATS score ranges:
+                0-39 = Poor
+                40-59 = Weak
+                60-74 = Average
+                75-84 = Strong
+                85-100 = Excellent
+
+            - Base scoring on:
+                * keyword overlap with job description
+                * relevance of experience
+                * measurable achievements
+                * ATS readability
+                * formatting clarity
+                * role alignment
+                * skill matching
+                * action verbs
+                * recruiter readability
+
+            - Penalize:
+                * missing keywords
+                * keyword stuffing
+                * vague summaries
+                * generic bullet points
+                * weak metrics
+                * irrelevant experience
+                * poor structure
+                * repeated skills
+                * long paragraphs
+
+            Rules:
+            - Do NOT invent fake experience, fake companies, fake degrees or fake certifications
+            - Improve wording using realistic US recruiter standards
+            - Use ATS-friendly formatting
+            - Add missing keywords ONLY when logically supported by the candidate’s real experience
+            - Preserve chronological consistency
+            - Rewrite bullet points to sound achievement-oriented
+            - Use concise bullet points focused on achievements and responsibilities
+            - Keep resume concise and recruiter-friendly
+            - Use strong action verbs
+            - Avoid duplicated skills
+            - Prioritize measurable impact where possible
+            - Ensure the output can be directly used in Laravel without additional cleanup
+
+            JSON Rules:
+            - Keep all arrays valid JSON arrays
+            - Return ONLY valid UTF-8 JSON
+            - Escape all special JSON characters correctly
+            - Keep arrays as valid JSON arrays
+            - No markdown
+            - No extra text before or after JSON
+            - Output must be directly parsable in Laravel
+
+            Resume:
+            $resumeText
+
+            Job description:
+            $jobDescription
+            PROMPT;
+    }
+
+    private function buildCleanTextAnalysePrompt(string $resumeText, string $jobDescription): string
+    {
+        return <<<PROMPT
+            You are an elite US ATS resume analyst, recruiter simulation engine, and resume optimization specialist, and text normalization engine.
+
+            Your task is to:
+                1. Clean and normalize the ORIGINAL resume text BEFORE any analysis:
+                    - Fix UTF-8 corruption and mojibake
+                    - Normalize spacing
+                    - Normalize punctuation
+                    - Normalize line breaks
+                    - Preserve ALL information
+                    - Do NOT summarize
+                    - Do NOT remove content
+                    - Keep original language
+                    - Improve readability only
+                1. Analyze the ORIGINAL resume against the job description
+                2. Simulate a realistic ATS evaluation
+                3. Generate an ATS-optimized US-style resume
+                4. Re-evaluate the OPTIMIZED resume against the same job description
+                5. Return realistic BEFORE and AFTER scoring based on actual improvements
+
+            IMPORTANT:
+                * Scores MUST reflect real differences between the original and optimized resume
+                * Do NOT invent random score increases
+                * The optimized score must be justified by actual keyword alignment, structure improvements, readability, and relevance
+                * Simulate a modern ATS + recruiter evaluation used in US hiring systems
+
+            Return ONLY valid JSON. No markdown. No explanations.
+
+            Use this exact structure:
+
+            {
+
+            "original_resume": {
+                "text_clean":"",
+                "resume_data":{
+                    "full_name":"",
+                    "headline":"",
+                    "professional_summary":"",
+                    "skills":[],
+                    "professional_experience":[],
+                    "education":[],
+                    "certifications":[],
+                    "projects":[],
+                    "languages":[]
+                },
                 "overall_ats_score": 0,
                 "match_level": "",
                 "job_fit_summary": "",
