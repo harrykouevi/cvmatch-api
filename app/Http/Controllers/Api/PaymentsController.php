@@ -153,6 +153,7 @@ class PaymentsController extends Controller
 
         try {
             $items = $stripe->checkout->sessions->allLineItems($session->id)->data;
+            Log::info(["checkout fdfdfdff", $items]) ;
         } catch (\Exception $e) {
             Log::error('Stripe line items error', [
                 'error' => $e->getMessage()
