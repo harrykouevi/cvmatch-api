@@ -146,29 +146,15 @@ class PaymentsController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-         // =====================================================
-        // 6. STRIPE CLIENT (OUTSIDE TRANSACTION)
-        // =====================================================
-        $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-
-        try {
-            $items = $stripe->checkout->sessions->allLineItems($session->id)->data;
-            Log::info(["checkout fdfdfdff", $items]) ;
-        } catch (\Exception $e) {
-            Log::error('Stripe line items error', [
-                'error' => $e->getMessage()
-            ]);
-            return response()->json(['error' => 'Stripe error'], 500);
-        }
 
 
-
+        $planID = $session->metadata->product_id ?? null;
 
 
         // =====================================================
         // 6. PROCESS PAYMENT (DB TRANSACTION SAFE)
         // =====================================================
-        DB::transaction(function () use ($session, $user, $event, $items) {
+        DB::transaction(function () use ($session, $user, $event, $planID) {
 
             // Stripe amount is in cents
             $amount = ($session->amount_total ?? 0) / 100;
@@ -202,26 +188,25 @@ class PaymentsController extends Controller
             ]);
 
 
-            // =================================================
-            // 8. PROCESS ITEMS → CREDITS
-            // =================================================
-            foreach ($items as $item) {
+            // // =================================================
+            // // 8. PROCESS ITEMS → CREDITS
+            // // =================================================
+            // foreach ($items as $item) {
 
-                $priceId = $item->price->id ?? null;
+            //     $priceId = $item->price->id ?? null;
 
-                if (!$priceId) {
-                    continue;
-                }
+            //     if (!$priceId) {
+            //         continue;
+            //     }
 
                 $plan = $this->creditPlanRepository
-                    ->findByField('provider_price_id', $priceId)
-                    ->first();
+                    ->find($planID);
 
                 if (!$plan) {
                     Log::warning('Stripe webhook: plan not found', [
-                        'price_id' => $priceId
+                        'plan_id' => $planID
                     ]);
-                    continue;
+                    return;
                 }
 
                 // Create purchase
@@ -252,7 +237,7 @@ class PaymentsController extends Controller
                         'price' => $plan->price,
                     ]
                 );
-            }
+            // }
         });
 
         // =====================================================
