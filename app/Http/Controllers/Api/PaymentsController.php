@@ -263,8 +263,8 @@ class PaymentsController extends Controller
                 'user_currency' => "usd",
             ],
 
-            "success_url" => "http://localhost:5173/payement/success?session_id={CHECKOUT_SESSION_ID}",
-            "cancel_url" => "http://localhost:5173/payement/cancel",
+            "success_url" => "https://cvmatchai.us/payement/success?session_id={CHECKOUT_SESSION_ID}",
+            "cancel_url" => "https://cvmatchai.us/payement/cancel",
         ]);
 
 
@@ -406,7 +406,7 @@ class PaymentsController extends Controller
 
         $user = User::where('email', $data['email'])->first();
         $token = $user->createToken('api-token')->plainTextToken;
-        return redirect("http://localhost:5173/payement/callback?token={$token}");
+        return redirect("https://cvmatchai.us/payement/callback?token={$token}");
     }
 
     public function handlePAddleWebhook(Request $request)
