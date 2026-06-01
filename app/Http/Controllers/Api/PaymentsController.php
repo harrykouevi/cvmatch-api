@@ -263,8 +263,8 @@ class PaymentsController extends Controller
                 'user_currency' => "usd",
             ],
 
-            "success_url" => "https://cvmatchai.us/payement/success?session_id={CHECKOUT_SESSION_ID}",
-            "cancel_url" => "https://cvmatchai.us/payement/cancel",
+            "success_url" => "https://cvmatchai.us/payment/success?session_id={CHECKOUT_SESSION_ID}",
+            "cancel_url" => "https://cvmatchai.us/payment/cancel",
         ]);
 
 
