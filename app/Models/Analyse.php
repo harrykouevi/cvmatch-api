@@ -65,7 +65,7 @@ class Analyse extends Model implements Transformable, HasMedia
      */
     public static array $rules = [
         'resume_id' => 'required|exists:resumes,id',
-        'job_description' => 'required|max:2250',
+        'job_description' => 'required|max:8000',
     ];
 
     protected $casts = [
