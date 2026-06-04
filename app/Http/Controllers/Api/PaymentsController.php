@@ -237,7 +237,7 @@ class PaymentsController extends Controller
             new PaymentSuccessMail([
                 'first_name' => $user->first_name ?? $user->name,
                 'plan_name' => $plan->name,
-                'amount' => '$' . number_format($plan->price, 2),
+                'amount' => ('$' . (($plan->price ?? 0) / 100)) ,
                 'credits_added' => $plan->credits,
                 'current_balance' => $currentBalance,
                 'transaction_id' => $payment->provider_payment_id,
