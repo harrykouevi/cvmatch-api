@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Controller;
+use App\Mail\PaymentSuccessMail;
 use App\Models\CreditPlan;
 use App\Models\User;
 use App\Repositories\Interfaces\CreditPlanRepository;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Http;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use Stripe\Webhook;
-
+use Illuminate\Support\Facades\Mail;
 
 class PaymentsController extends Controller
 {
@@ -146,15 +147,20 @@ class PaymentsController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-
-
         $planID = $session->metadata->product_id ?? null;
+        $plan = $this->creditPlanRepository->find($planID);
+        if (!$plan) {
+            Log::warning('Stripe webhook: plan not found', [
+                'plan_id' => $planID
+            ]);
+            return response()->json(['error' => 'plan not found'], 404);
+        }
 
-
+        $currentBalance = $this->creditRepository->findWhere([ 'user_id' => $user->id])->first()?->balance  ;// adapte à ton projet
         // =====================================================
         // 6. PROCESS PAYMENT (DB TRANSACTION SAFE)
         // =====================================================
-        DB::transaction(function () use ($session, $user, $event, $planID) {
+        DB::transaction(function () use ($session, $user, $event, $plan) {
 
             // Stripe amount is in cents
             $amount = ($session->amount_total ?? 0) / 100;
@@ -186,28 +192,6 @@ class PaymentsController extends Controller
                     'stripe_session_id' => $session->id,
                 ],
             ]);
-
-
-            // // =================================================
-            // // 8. PROCESS ITEMS → CREDITS
-            // // =================================================
-            // foreach ($items as $item) {
-
-            //     $priceId = $item->price->id ?? null;
-
-            //     if (!$priceId) {
-            //         continue;
-            //     }
-
-                $plan = $this->creditPlanRepository
-                    ->find($planID);
-
-                if (!$plan) {
-                    Log::warning('Stripe webhook: plan not found', [
-                        'plan_id' => $planID
-                    ]);
-                    return;
-                }
 
                 // Create purchase
                 $this->purchaseRepository->create([
@@ -243,6 +227,23 @@ class PaymentsController extends Controller
         // =====================================================
         // 9. SUCCESS RESPONSE
         // =====================================================
+        $payment = $this->paymentRepository->findWhere([
+                'provider' => 'stripe',
+                'provider_payment_id' => $session->payment_intent ])->first() ;
+
+        Mail::to($user->email)->queue(
+            new PaymentSuccessMail([
+                'first_name' => $user->first_name ?? $user->name,
+                'plan_name' => $plan->name,
+                'amount' => '$' . number_format($plan->price, 2),
+                'credits_added' => $plan->credits,
+                'current_balance' => $currentBalance,
+                'transaction_id' => $payment->provider_payment_id,
+                'dashboard_url' => config('app.frontend_url') . '/?from=email_checkout&to=dashboard',
+                'app_url' => config('app.frontend_url'). '/?from=email_checkout&to=app',
+                'support_email' => 'assistance@cvmatchai.us',
+            ])
+        );
         return response()->json(['status' => 'success']);
     }
 

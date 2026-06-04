@@ -78,83 +78,88 @@ class AuthController extends ApiController
 
     public function redirectToGoogle(Request $request)
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        // return Socialite::driver('google')->stateless()->redirect();
 
 
-        // $guestToken = request('guest_token');
-        // $guestUser = Null ;
-        // if ($guestToken) {
-        //     $guestUser = $this->userRepository->findWhere([
-        //         'guest_token' => $guestToken,
-        //         'is_guest' => true,
-        //     ])->first();
-        // }
+        $guestToken = request('guest_token');
+        $guestUser = Null ;
+        if ($guestToken) {
+            $guestUser = $this->userRepository->findWhere([
+                'guest_token' => $guestToken,
+                'is_guest' => true,
+            ])->first();
+        }
 
-        // $existingUser = $this->userRepository->findByField('email', 'harry.kouevi@gmail.com')->first();
+        $existingUser = $this->userRepository->findByField('email', 'harry.kouevi@gmail.com')->first();
 
-        // if ($existingUser) {
-        //     if ($guestUser) {
+        if ($existingUser) {
+            if ($guestUser) {
 
-        //         Log::error(['guestUser is doing fusion']) ;
+                Log::error(['guestUser is doing fusion']) ;
 
-        //         $analyses = $this->analyseRepository->findByField('user_id', $guestUser->id);
-        //         Log::error(['analyse count',$analyses->count()])  ;
-        //         foreach ($analyses as $analyse) {
-        //             $analyse->update([
-        //                 'user_id' => $existingUser->id
-        //             ]);
-        //         }
+                $analyses = $this->analyseRepository->findByField('user_id', $guestUser->id);
+                Log::error(['analyse count',$analyses->count()])  ;
+                foreach ($analyses as $analyse) {
+                    $analyse->update([
+                        'user_id' => $existingUser->id
+                    ]);
+                }
 
-        //         $resumes = $this->resumeRepository->findByField('user_id', $guestUser->id) ;
-        //         Log::error(['$resumes count',$resumes->count()])  ;
+                $resumes = $this->resumeRepository->findByField('user_id', $guestUser->id) ;
+                Log::error(['$resumes count',$resumes->count()])  ;
 
-        //         foreach ($resumes as $analyse) {
-        //             $analyse->update([
-        //                 'user_id' => $existingUser->id
-        //             ]);
-        //         }
-        //         // supprimer guest
-        //         $guestUser->delete();
-        //     }
+                foreach ($resumes as $analyse) {
+                    $analyse->update([
+                        'user_id' => $existingUser->id
+                    ]);
+                }
 
-        // }else{
+                $this->userRepository->update([
+                    'current_analyse_done' =>  $guestUser->current_analyse_done,
+                ], $guestUser->id);
+                // supprimer guest
+                $guestUser->delete();
+            }
 
-        //      /**
-        //      * CAS 2 :
-        //      * convertir le guest en vrai compte
-        //      */
-        //     if ($guestUser) {
+        }else{
 
-        //         $this->userRepository->update([
-        //             'name' => 'harry.kouevi',
-        //             'email' => 'harry.kouevi@gmail.com',
-        //             'password' => bcrypt(str()->random(16)),
-        //             'is_guest' => false,
-        //             'guest_token' => null,
-        //         ], $guestUser->id);
+             /**
+             * CAS 2 :
+             * convertir le guest en vrai compte
+             */
+            if ($guestUser) {
 
-        //         $existingUser = $guestUser;
+                $this->userRepository->update([
+                    'name' => 'harry.kouevi',
+                    'email' => 'harry.kouevi@gmail.com',
+                    'password' => bcrypt(str()->random(16)),
+                    'is_guest' => false,
+                    'guest_token' => null,
+                ], $guestUser->id);
 
-        //     } else {
+                $existingUser = $guestUser;
 
-        //          /**
-        //          * CAS 3 :
-        //          * aucun guest
-        //          */
-        //         $existingUser = $this->userRepository->create([
-        //             'name' => 'harry.kouevi',
-        //             'email' => 'harry.kouevi@gmail.com',
-        //             'password' => bcrypt(str()->random(16)),
-        //             'is_guest' => false,
-        //             'guest_token' => null,
-        //         ]);
-        //     }
-        // }
+            } else {
+
+                 /**
+                 * CAS 3 :
+                 * aucun guest
+                 */
+                $existingUser = $this->userRepository->create([
+                    'name' => 'harry.kouevi',
+                    'email' => 'harry.kouevi@gmail.com',
+                    'password' => bcrypt(str()->random(16)),
+                    'is_guest' => false,
+                    'guest_token' => null,
+                    'current_analyse_done' => null,
+                ]);
+            }
+        }
 
 
-        // $token = $existingUser->createToken('api-token')->plainTextToken;
-        // $token = urlencode($token) ;
-        // return redirect("http://localhost:5173/auth/callback?token={$token}");
+        $token = $existingUser->createToken('api-token')->plainTextToken;
+        $token = urlencode($token) ;
+        return redirect("http://localhost:5173/auth/callback?token={$token}");
     }
 
     public function handleGoogleCallback(Request $request)
@@ -193,6 +198,11 @@ class AuthController extends ApiController
                         'user_id' => $existingUser->id
                     ]);
                 }
+
+                $this->userRepository->update([
+                    'current_analyse_done' =>  $guestUser->current_analyse_done,
+                ], $guestUser->id);
+
                 // supprimer guest
                 $guestUser->delete();
             }
@@ -227,6 +237,7 @@ class AuthController extends ApiController
                     'password' => bcrypt(str()->random(16)),
                     'is_guest' => false,
                     'guest_token' => null,
+                    'current_analyse_done' => null,
                 ]);
             }
         }

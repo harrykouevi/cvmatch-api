@@ -21,6 +21,8 @@ class UserProfileResource extends JsonResource
             'email' => $this->email,
             'is_guest' => $this->is_guest,
             'resumes_count' =>  $this->resumes_count,
+            'current_analyse_done'=> $this->current_analyse_done,
+
         ] ;
         if($this->is_guest){
             return  $u;

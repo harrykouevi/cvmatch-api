@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Analyse;
 use App\Models\Resume;
+use App\Models\User;
 use App\Repositories\Interfaces\AnalyseRepository;
 use App\Services\OpenAIResumeService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -151,6 +152,7 @@ class AiPerformJob implements ShouldQueue
                 ->update($data) ;
 
             Resume::where('id', $analyse->resume->id)->update(['extracted_text'=>  $aiData["original_resume"]["text_clean"] ]);
+            User::where('id', $analyse->user_id)->update(['current_analyse_done'=>  $analyse->id ]);
             // $analyseRepository->update($data,$analyseId);
             Log::info('AI analysis completed successfully', [ 'analyse_id' => $analyseId,]);
         } catch (\Throwable $e) {

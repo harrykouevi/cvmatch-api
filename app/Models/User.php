@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable ,HasRoles ,InteractsWithMedia , HasTranslations , HasApiTokens;
+    use HasFactory, Notifiable  ,InteractsWithMedia , HasTranslations , HasApiTokens;
 
     protected static function booted()
     {
@@ -39,6 +39,7 @@ class User extends Authenticatable implements HasMedia
         'password',
         'is_guest',
         'guest_token',
+        'current_analyse_done',
         'terms_accepted' ,
         'terms_accepted_at'
     ];

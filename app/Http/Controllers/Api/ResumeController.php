@@ -106,6 +106,8 @@ class ResumeController extends Controller
             );
         }
 
+        $this->userRepository->update(['current_analyse_done'=>  null ], $user->id);
+
         $resume->load('media');
         return $resume;
     }

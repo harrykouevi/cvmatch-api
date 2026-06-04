@@ -79,7 +79,7 @@ class CreditPlan extends Model implements Transformable
                 'cta' => 'Unlock for ' . ($snapshot['formatted_price'] ?? '$5'),
                 'url' => $snapshot['short_url'] ?? null,
             ];
-        }
+        }else
 
         if($this->provider == "paddle"){
             $snapshot = json_decode($this->provider_product_snapshot_json, true);
@@ -97,6 +97,30 @@ class CreditPlan extends Model implements Transformable
                 'name' => $this->name ?? null,
                 'provider' => $this->provider ?? null,
                 'price_id' => $this->provider_price_id,
+                'price' => $this->price ? ('$' . (($this->price ?? 0) / 100)) : null,
+                'subtitle' => $snapshot['description'] ?? null,
+                'badge' =>  $customData['badge'] ?? null,
+                'features' => $features,
+                'description' => $customData['details'] ?? null,
+                'cta' => 'Unlock for ' . ('$' .(($this->price ?? 0) / 100) ?? '$5') ,
+                'url' => $snapshot['short_url'] ?? null,
+            ];
+        }else
+        {
+            $snapshot = json_decode($this->provider_product_snapshot_json, true);
+            $description = $snapshot['description'] ?? '';
+            $customData = $snapshot['custom_data'] ?? [];
+            Log::info('first one',[$customData]);
+            $features = $customData['features'] ?? [];
+            if (is_string($features)) {
+                $features = json_decode($features, true)?? [];
+            }
+            $features = $this->buildSymplifyFeatures($this->prepareFeaturesFromPaddle($features));
+
+            return [
+                'id' => $this->id,
+                'name' => $this->name ?? null,
+                'provider' => $this->provider ?? null,
                 'price' => $this->price ? ('$' . (($this->price ?? 0) / 100)) : null,
                 'subtitle' => $snapshot['description'] ?? null,
                 'badge' =>  $customData['badge'] ?? null,
@@ -162,17 +186,6 @@ class CreditPlan extends Model implements Transformable
 
     private function prepareFeaturesFromPaddle(array $json): array
     {
-        // $text = html_entity_decode(strip_tags($json));
-
-        // if (!str_contains($text, 'This pack includes')) {
-        //     return [];
-        // }
-
-        // $after = explode('This pack includes:', $text)[1] ?? '';
-
-        // dd($after) ;
-
-        // $lines = preg_split('/\r\n|\r|\n/', $after);
 
         $features = [];
         $lines = $json ;
@@ -219,16 +232,6 @@ class CreditPlan extends Model implements Transformable
         }
         $total = collect($features)->first()['qty'] ?? 0;
         return "{$total} targeted job application";
-
-        // $total = collect($features)->sum('qty');
-
-        // $texts = collect($features)->pluck('text')->map(fn($t) => strtolower($t));
-        // $hasResume = $texts->contains(fn($t) => str_contains($t, 'resume'));
-        // $hasCover  = $texts->contains(fn($t) => str_contains($t, 'cover'));
-        // 🔥 your requested format
-        // if ($hasResume && $hasCover) {
-        //     return "{$total} targeted job application";
-        // }
     }
 
     private function buildSymplifyFeatures(array $features): array
