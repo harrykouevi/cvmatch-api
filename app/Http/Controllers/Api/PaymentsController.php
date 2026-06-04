@@ -76,8 +76,7 @@ class PaymentsController extends Controller
             Log::error('Stripe webhook invalid signature', [
                 'error' => $e->getMessage()
             ]);
-
-            return response()->json(['error' => 'Invalid signature'], 400);
+            return response()->json(['error' => true], 500);
         }
 
 
@@ -105,7 +104,8 @@ class PaymentsController extends Controller
         // 2. ONLY HANDLE REQUIRED EVENT
         // =====================================================
         if ($event->type !== 'checkout.session.completed') {
-            return response()->json(['message' => 'Event ignored']);
+            Log::error('Stripe Event ignored');
+            return response()->json(['error' => true], 500);
         }
 
          // =====================================================
@@ -117,7 +117,8 @@ class PaymentsController extends Controller
         // 4. VERIFY PAYMENT STATUS
         // =====================================================
         if (($session->payment_status ?? null) !== 'paid') {
-            return response()->json(['message' => 'Payment not completed']);
+            Log::error('Payment not completed');
+            return response()->json(['error' => true], 500);
         }
 
         // $paymentIntentId = $session->payment_intent ?? null;
@@ -135,7 +136,7 @@ class PaymentsController extends Controller
          $userId = $session->metadata->user_id ?? null;
         if (!$userId) {
             Log::error('Stripe webhook missing user_id metadata');
-            return response()->json(['error' => 'Missing user_id'], 400);
+            return response()->json(['error' => true], 500);
         }
         $user = User::find($userId);
 
@@ -144,7 +145,7 @@ class PaymentsController extends Controller
                 'user_id' => $userId
             ]);
 
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['error' => true], 500);
         }
 
         $planID = $session->metadata->product_id ?? null;
@@ -153,14 +154,14 @@ class PaymentsController extends Controller
             Log::warning('Stripe webhook: plan not found', [
                 'plan_id' => $planID
             ]);
-            return response()->json(['error' => 'plan not found'], 404);
+            return response()->json(['error' => true], 500);
         }
 
         $currentBalance = $this->creditRepository->findWhere([ 'user_id' => $user->id])->first()?->balance  ;// adapte à ton projet
         // =====================================================
         // 6. PROCESS PAYMENT (DB TRANSACTION SAFE)
         // =====================================================
-        DB::transaction(function () use ($session, $user, $event, $plan) {
+        $payment = DB::transaction(function () use ($session, $user, $event, $plan) {
 
             // Stripe amount is in cents
             $amount = ($session->amount_total ?? 0) / 100;
@@ -221,15 +222,16 @@ class PaymentsController extends Controller
                         'price' => $plan->price,
                     ]
                 );
-            // }
+            return $payment;
         });
 
+        if (!$payment) {
+            Log::error('Payment creation failed');
+            return response()->json(['error' => true], 500);
+        }
         // =====================================================
         // 9. SUCCESS RESPONSE
         // =====================================================
-        $payment = $this->paymentRepository->findWhere([
-                'provider' => 'stripe',
-                'provider_payment_id' => $session->payment_intent ])->first() ;
 
         Mail::to($user->email)->queue(
             new PaymentSuccessMail([
@@ -244,7 +246,7 @@ class PaymentsController extends Controller
                 'support_email' => 'assistance@cvmatchai.us',
             ])
         );
-        return response()->json(['status' => 'success']);
+        return response()->json(['received' => true]);
     }
 
 
