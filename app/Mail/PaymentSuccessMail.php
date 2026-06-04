@@ -19,7 +19,7 @@ class PaymentSuccessMail extends Mailable implements ShouldQueue
     {
         $this->purchase = $purchase;
 
-        $this->onQueue('ai');
+        $this->onQueue('default');
     }
 
     public function build()
