@@ -43,7 +43,7 @@ class ProductController extends Controller
         }
         $products = $this->creditPlanRepository->scopeQuery(function ($query) {
             return $query->where('is_active', true)
-                        // ->where('credits', '>', 0)
+                        ->where('credits', '>', 0)
                         ->orderBy('price', 'asc'); ;
         })->get();
 
