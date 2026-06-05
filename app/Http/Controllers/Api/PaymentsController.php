@@ -149,7 +149,17 @@ class PaymentsController extends Controller
         }
 
         $planID = $session->metadata->product_id ?? null;
-        $plan = $this->creditPlanRepository->find($planID);
+        if (is_numeric($planID)) {
+            $plan = $this->creditPlanRepository->findWhere([
+                'id' => $planID
+            ]) ->first();
+        } else {
+            if (Str::isUuid($planID)) {
+                $plan = $this->creditPlanRepository->findWhere(['uuid'=> $planID])->first();
+            } else {
+                return response()->json(['error' => true], 500);
+            }
+        }
         if (!$plan) {
             Log::warning('Stripe webhook: plan not found', [
                 'plan_id' => $planID
@@ -271,12 +281,12 @@ class PaymentsController extends Controller
             if (Str::isUuid($productId)) {
                 $product = $this->creditPlanRepository->findWhere(['uuid'=> $productId])->first();
             } else {
-                return $this->sendError('Analyse not found');
+                return $this->sendError("Product not found", 404);
             }
         }
         Log::info($product) ;
         if (!$product) {
-            $this->sendError("Product not found", 404);
+            return  $this->sendError("Product not found", 404);
         }
 
         Stripe::setApiKey(config("services.stripe.secret"));

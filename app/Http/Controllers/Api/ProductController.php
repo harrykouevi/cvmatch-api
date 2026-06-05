@@ -63,7 +63,7 @@ class ProductController extends Controller
             ])
             ->first();
 
-             if (is_numeric($id)) {
+            if (is_numeric($id)) {
                 $product = $this->creditPlanRepository->findWhere([
                     'id' => $id
                 ]) ->first();
