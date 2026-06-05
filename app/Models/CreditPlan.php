@@ -109,7 +109,7 @@ class CreditPlan extends Model implements Transformable
             $features = $this->buildSymplifyFeatures($this->prepareFeaturesFromPaddle($features));
 
             return [
-                'id' => $this->id,
+                'id' =>  $this->uuid,
                 'name' => $this->name ?? null,
                 'provider' => $this->provider ?? null,
                 'price_id' => $this->provider_price_id,
@@ -134,7 +134,7 @@ class CreditPlan extends Model implements Transformable
             $features = $this->buildSymplifyFeatures($this->prepareFeaturesFromPaddle($features));
 
             return [
-                'id' => $this->id,
+                'id' =>  $this->uuid,
                 'name' => $this->name ?? null,
                 'provider' => $this->provider ?? null,
                 'price' => $this->price ? ('$' . (($this->price ?? 0) / 100)) : null,
