@@ -143,7 +143,7 @@ class OpenAIResumeService
                 }
             }else{
 
-                $data = ["text_clean" => $this->fakeResume ];
+                $data = ["text_clean" => "" ];
                 $output = json_encode($data);
             }
 
@@ -322,19 +322,21 @@ class OpenAIResumeService
                     - Do NOT remove content
                     - Keep original language
                     - Improve readability only
-                1. Analyze the ORIGINAL resume against the job description
-                2. Simulate a realistic ATS evaluation
-                3. Generate an ATS-optimized US-style resume
-                4. Re-evaluate the OPTIMIZED resume against the same job description
-                5. Return realistic BEFORE and AFTER scoring based on actual improvements
+                2. Extract structured information from the ORIGINAL resume.
+                3. Analyze the ORIGINAL resume against the job description
+                4. Simulate a realistic ATS evaluation
+                5. Generate an ATS-optimized US-style resume
+                6. Re-evaluate the OPTIMIZED resume against the same job description
+                7. Return realistic BEFORE and AFTER scoring based on actual improvements
 
             IMPORTANT:
                 * Scores MUST reflect real differences between the original and optimized resume
                 * Do NOT invent random score increases
                 * The optimized score must be justified by actual keyword alignment, structure improvements, readability, and relevance
-                * Simulate a modern ATS + recruiter evaluation used in US hiring systems
+                * The optimized resume must be truthful, recruiter-realistic, ATS-friendly, and suitable for professional US applications.
 
-            Return ONLY valid JSON. No markdown. No explanations.
+
+            Return ONLY valid JSON. No markdown. No explanations. No text before or after the JSON.
 
             Use this exact structure:
 
@@ -345,13 +347,26 @@ class OpenAIResumeService
                 "resume_data":{
                     "full_name":"",
                     "headline":"",
+                    "contact": {
+                        "email": "",
+                        "phone": "",
+                        "location": "",
+                        "linkedin": "",
+                        "portfolio": ""
+                    },
                     "professional_summary":"",
-                    "skills":[],
-                    "professional_experience":[],
-                    "education":[],
-                    "certifications":[],
-                    "projects":[],
-                    "languages":[]
+                    "skills":{
+                        "technical": [],
+                        "soft": [],
+                        "tools": [],
+                        "platforms": []
+                    },
+                    "professional_experience": [ { "company": "", "title": "", "location": "", "dates": "", "description": "", "bullets": [], "technologies": [], "achievements": [] } ],
+                    "education": [ { "degree": "", "institution": "", "location": "", "dates": "", "details": "" } ],
+                    "certifications":[ { "name": "", "issuer": "", "date": "", "expiration": "" } ],
+                    "projects":[ { "name": "", "description": "", "technologies": [], "role": "", "impact": "" } ],
+                    "languages": [ { "language": "", "level": "" } ],
+                    "additional_sections": ""
                 },
                 "overall_ats_score": 0,
                 "match_level": "",
@@ -393,13 +408,15 @@ class OpenAIResumeService
             "optimized_resume_array": {
                 "full_name": "",
                 "headline": "",
+                "contact": { "email": "", "phone": "", "location": "", "linkedin": "", "portfolio": "" },
                 "professional_summary": "",
-                "skills": [],
-                "professional_experience": [],
-                "education": [],
-                "certifications": [],
-                "projects": [],
-                "languages": []
+                "skills": { "technical": [], "soft": [], "tools": [], "platforms": [] },
+                "professional_experience": [ { "company": "", "title": "", "location": "", "dates": "", "description": "", "bullets": [], "technologies": [], "achievements": [] } ],
+                "education": [ { "degree": "", "institution": "", "location": "", "dates": "", "details": "" } ],
+                "certifications": [ { "name": "", "issuer": "", "date": "", "expiration": "" } ],
+                "projects": [ { "name": "", "description": "", "technologies": [], "role": "", "impact": "" } ],
+                "languages": [ { "language": "", "level": "" } ],
+                "additional_sections": ""
             },
             "cover_letter": "",
             "recommendations": [],
@@ -419,45 +436,84 @@ class OpenAIResumeService
 
             - Base scoring on:
                 * keyword overlap with job description
+                * hard skill alignment
                 * relevance of experience
                 * measurable achievements
                 * ATS readability
                 * formatting clarity
                 * role alignment
-                * skill matching
                 * action verbs
                 * recruiter readability
+                * clarity of responsibilities
 
             - Penalize:
                 * missing keywords
                 * keyword stuffing
                 * vague summaries
                 * generic bullet points
-                * weak metrics
+                * weak or absent metrics
                 * irrelevant experience
                 * poor structure
                 * repeated skills
                 * long paragraphs
+                * unsupported claims
 
-            Rules:
-            - Do NOT invent fake experience, fake companies, fake degrees or fake certifications
-            - Improve wording using realistic US recruiter standards
-            - Use ATS-friendly formatting
-            - Add missing keywords ONLY when logically supported by the candidate’s real experience
-            - Preserve chronological consistency
-            - Rewrite bullet points to sound achievement-oriented
-            - Use concise bullet points focused on achievements and responsibilities
-            - Keep resume concise and recruiter-friendly
-            - Use strong action verbs
-            - Avoid duplicated skills
-            - Prioritize measurable impact where possible
-            - Ensure the output can be directly used in Laravel without additional cleanup
+            Truthfulness Rules:
+            - The optimized resume MUST contain ONLY information that:
+            1. exists in the original resume,
+            2. can be logically inferred from the candidate's real experience,
+            3. or represents wording improvements of existing information.
+            - Do NOT invent fake experience.
+            - Do NOT invent fake companies.
+            - Do NOT invent fake job titles.
+            - Do NOT invent fake dates.
+            - Do NOT invent fake degrees.
+            - Do NOT invent fake certifications.
+            - Do NOT invent fake projects.
+            - Do NOT invent fake technologies.
+            - Do NOT invent fake achievements.
+            - Do NOT invent fake metrics.
+            - If information is missing, leave the field empty instead of fabricating content.
+
+            Resume Optimization Rules:
+            - Use professional US resume standards.
+            - Use ATS-friendly wording and structure.
+            - Add missing keywords ONLY when logically supported by the candidate's real experience.
+            - Preserve chronological consistency.
+            - Rewrite bullet points to sound achievement-oriented.
+            - Use concise bullet points focused on responsibilities and impact.
+            - Keep content recruiter-friendly and realistic.
+            - Use strong action verbs.
+            - Avoid duplicated skills.
+            - Prioritize measurable impact only when supported by the original resume.
+            - Keep the final resume focused on the target job description.
+
+            Structured Resume Rules:
+            - Structure all resume sections for professional PDF rendering.
+            - professional_experience must always be an array of objects.
+            - Each professional_experience object should include, whenever possible: company, title, location, dates, description, bullets, technologies, achievements.
+            - projects must always be an array of objects.
+            - Each project object should include, whenever possible: name, description, technologies, role, impact.
+            - education must always be an array of objects.
+            - certifications must always be an array of objects.
+            - languages must always be an array of objects.
+            - skills must be grouped into: technical, soft, tools, platforms.
+            - additional_sections may include awards, volunteer experience, publications, professional memberships, or other truthful relevant sections.
+            - If a section has no supported information, return an empty array or empty string.
+            - The JSON must be optimized for:
+                ATS parsing,
+                recruiter readability,
+                premium PDF generation,
+                Laravel rendering,
+                structured frontend rendering.
+
 
             JSON Rules:
             - Keep all arrays valid JSON arrays
             - Return ONLY valid UTF-8 JSON
             - Escape all special JSON characters correctly
             - Keep arrays as valid JSON arrays
+            - No trailing commas.
             - No markdown
             - No extra text before or after JSON
             - Output must be directly parsable in Laravel

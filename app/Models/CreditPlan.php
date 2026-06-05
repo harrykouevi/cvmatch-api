@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
+use Illuminate\Support\Str;
+
 
 /**
  * Class CreditPlan
@@ -18,12 +20,15 @@ class CreditPlan extends Model implements Transformable
 
     use TransformableTrait;
 
+
+    protected $hidden = ['id'] ;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
+        'uuid',
         'name',
         'price' ,
         'currency',
@@ -36,6 +41,17 @@ class CreditPlan extends Model implements Transformable
         'synced_at',
     ];
 
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (!$model->uuid) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
      /**
      * Validation rules
@@ -66,7 +82,7 @@ class CreditPlan extends Model implements Transformable
             $features = $this->extractFeaturesFromDescription($description);
 
             return [
-                'id' =>  $this->id,
+                'id' =>  $this->uuid,
                 'name' => $snapshot['name'] ?? null,
                 'provider' => $this->provider ?? null,
                 'price' => isset($snapshot['formatted_price'])

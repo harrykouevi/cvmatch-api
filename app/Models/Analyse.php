@@ -7,6 +7,9 @@ use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Support\Str;
+
+
 
 /**
  * Class Resume.
@@ -30,6 +33,7 @@ class Analyse extends Model implements Transformable, HasMedia
      * @var array
      */
     protected $fillable = [
+        "uuid",
         "resume_id",
         "user_id",
         "job_description",
@@ -58,6 +62,16 @@ class Analyse extends Model implements Transformable, HasMedia
     ];
 
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (!$model->uuid) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
      /**
      * Validation rules
      *

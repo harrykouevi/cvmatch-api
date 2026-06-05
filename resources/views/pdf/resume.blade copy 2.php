@@ -135,7 +135,7 @@ $contacts = array_filter([
     $resume['contact']['linkedin'] ?? null,
 ]);
 @endphp
-<div class="container resume modern " id="resume">
+<div class="container resume tech " id="resume">
 
     <!-- HEADER -->
 

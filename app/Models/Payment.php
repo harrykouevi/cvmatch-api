@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Support\Str;
 
 /**
  * Class Payment.
@@ -25,6 +24,7 @@ class Payment extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
+        "uuid",
         'provider',
         'provider_payment_id',
         'user_id',
@@ -35,6 +35,16 @@ class Payment extends Model implements Transformable
         'meta_json',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (!$model->uuid) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     protected $casts = [
         'meta_json' => 'array',

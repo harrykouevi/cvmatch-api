@@ -10,6 +10,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
+use Illuminate\Support\Str;
+
 
 
 class ProductController extends Controller
@@ -41,7 +43,7 @@ class ProductController extends Controller
         }
         $products = $this->creditPlanRepository->scopeQuery(function ($query) {
             return $query->where('is_active', true)
-                        ->where('credits', '>', 0)
+                        // ->where('credits', '>', 0)
                         ->orderBy('price', 'asc'); ;
         })->get();
 
@@ -50,7 +52,7 @@ class ProductController extends Controller
 
     }
 
-    public function show(int $id, Request $request): JsonResponse
+    public function show($id, Request $request): JsonResponse
     {
 
         try {
@@ -60,6 +62,18 @@ class ProductController extends Controller
                 'id' => $id
             ])
             ->first();
+
+             if (is_numeric($id)) {
+                $product = $this->creditPlanRepository->findWhere([
+                    'id' => $id
+                ]) ->first();
+            } else {
+                if (Str::isUuid($id)) {
+                    $product = $this->creditPlanRepository->findWhere(['uuid'=> $id])->first();
+                } else {
+                    return $this->sendError('Analyse not found');
+                }
+            }
             if (empty($product)) {
                 return $this->sendError('Analyse not found');
             }
