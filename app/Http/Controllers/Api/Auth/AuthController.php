@@ -78,6 +78,7 @@ class AuthController extends ApiController
 
     public function redirectToGoogle(Request $request)
     {
+
         return Socialite::driver('google')->stateless()->redirect();
 
 
