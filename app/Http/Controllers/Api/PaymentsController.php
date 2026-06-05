@@ -263,7 +263,17 @@ class PaymentsController extends Controller
         ]);
 
         $productId = $request->product_id;
-        $product = $this->creditPlanRepository->find( $productId );
+        if (is_numeric($productId)) {
+            $product = $this->creditPlanRepository->findWhere([
+                'id' => $productId
+            ]) ->first();
+        } else {
+            if (Str::isUuid($productId)) {
+                $product = $this->creditPlanRepository->findWhere(['uuid'=> $productId])->first();
+            } else {
+                return $this->sendError('Analyse not found');
+            }
+        }
         Log::info($product) ;
         if (!$product) {
             $this->sendError("Product not found", 404);
