@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Illuminate\Validation\ValidationException;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Illuminate\Support\Str;
@@ -302,7 +303,7 @@ class AnalyseController extends Controller
 
 
         $using_array = true;
-        if($using_array == true ){
+        if($using_array == true && $analyse->created_at->gt(Carbon::create(2026, 6, 12))){
 
             $resume = json_decode($analyse->optimized_resume, true);
             if (!$resume) {
