@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 
-Route::post('/gumroad/webhook', [PaymentsController::class, 'handleGumroadWebhook'])->name('payments.webhooks.gumroad');
-// Route::get('/payment/success', function () {  return view('payment-success'); })->name('paddle.success');
-// Route::get('/payment/success', function () { return redirect('http://localhost:5173/payement/callback'); })->name('paddle.success');
 Route::post('/payments/stripe/webhook', [PaymentsController::class, 'handleStripeWebhook']);
 
 
@@ -28,11 +25,9 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/mobile-waitlist', [MobileWaitlistController::class, 'store'])->name('mobile-waitlist.store');
     // POST /api/resumes/upload ✔️
-    Route::post('/resumes/visitor-upload', [ResumeController::class, 'visitorStore'])->name('resumes.upload');
+    Route::post('/resumes/visitor-upload', [ResumeController::class, 'visitorStore'])->name('resumes.visitor-upload');
     // POST /api/events/track
     Route::post('events/track', [EventController::class, 'store'])->name('events.store');
-
-    Route::get('/payments/webhooks/simulation', [PaymentsController::class, 'simulateWebhook'])->name('payments.webhooks.simulation');
 
     Route::middleware(['guest.or.auth'])->group(function () {
         Route::get('/auth/me', [AuthController::class, 'show']);
@@ -51,13 +46,11 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/accept-terms', [AuthController::class, 'acceptTerms']);
 
-        Route::get('/analyses/{id}/unlock', [AnalyseController::class, 'unlockFullResult'])->name('analyses.unlock');
+        Route::post('/analyses/{id}/unlock', [AnalyseController::class, 'unlockFullResult'])->name('analyses.unlock');
         Route::get('/analyses/{id}/download/resume', [AnalyseController::class, 'downloadResume'])->name('analyses.download.resume');
         Route::get('/analyses/{id}/download/cover-letter', [AnalyseController::class, 'downloadCoverLetter']);
 
-        Route::get('/payments/gumroad', [PaymentsController::class, 'redirectToGumroad']);
         Route::post('/payments/stripe/session', [PaymentsController::class, 'createStripeSession']);
-        Route::post('/payments/paddle/checkout', [PaymentsController::class, 'createPaddleCheckout']);
 
     });
 

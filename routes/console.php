@@ -18,3 +18,6 @@ Schedule::call(function () {
 })
 // ->everyFiveSeconds();
 ->everyMinute();
+
+// Privacy retention: purge stale resume/analysis sensitive data daily.
+Schedule::command('cvmatch:cleanup-old-data')->daily();

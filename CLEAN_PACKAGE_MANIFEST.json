@@ -1,0 +1,29 @@
+{
+  "total_files": 170,
+  "total_bytes": 1023229,
+  "top_counts": {
+    ".editorconfig": 1,
+    ".env.example": 1,
+    ".gitattributes": 1,
+    ".gitignore": 1,
+    "CLAUDE_BACKEND_HANDOFF.md": 1,
+    "README.md": 1,
+    "app": 72,
+    "artisan": 1,
+    "bootstrap": 3,
+    "composer.json": 1,
+    "composer.lock": 1,
+    "config": 15,
+    "database": 37,
+    "package.json": 1,
+    "phpunit.xml": 1,
+    "public": 4,
+    "resources": 14,
+    "routes": 3,
+    "scheduler.sh": 1,
+    "tests": 7,
+    "vite.config.js": 1,
+    "watchdog-ai.sh": 1,
+    "watchdog-default.sh": 1
+  }
+}

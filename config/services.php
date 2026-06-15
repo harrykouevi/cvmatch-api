@@ -61,4 +61,10 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'cvmatch' => [
+        // Number of days sensitive resume/analysis data is retained before
+        // the cvmatch:cleanup-old-data command purges it.
+        'data_retention_days' => (int) env('CVMATCH_DATA_RETENTION_DAYS', 90),
+    ],
+
 ];

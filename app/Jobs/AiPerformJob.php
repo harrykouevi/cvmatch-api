@@ -93,7 +93,7 @@ class AiPerformJob implements ShouldQueue
             }
 
             $response = $service->analyze($resumeText, $analyse->job_description);
-            Log::info('openAI response AiPerfomEvent#' , [ 'response' => $response, ]);
+            Log::info('openAI response AiPerfomEvent#' , [ 'analyse_id' => $analyse?->id, ]);
 
             if (! ($response['success'] ?? false)) {
                 // =====================================================
@@ -109,7 +109,7 @@ class AiPerformJob implements ShouldQueue
                     $this->release(20);
                     return;
                 }
-                Log::error('AI analysis failed permanently', [ 'analyse_id' => $analyseId, 'response' => $response,]);
+                Log::error('AI analysis failed permanently', [ 'analyse_id' => $analyseId,]);
                 $analyse->update(['status' => 'failed']);
                 return;
             }

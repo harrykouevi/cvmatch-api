@@ -73,12 +73,18 @@ class ResumeController extends Controller
                 ]);
             }
 
+            // Max upload size: 10 MB.
+            if ($file->getSize() > 10 * 1024 * 1024) {
+                throw ValidationException::withMessages([
+                    'media' => 'Le fichier ne doit pas dépasser 10 Mo.',
+                ]);
+            }
+
             $mime = $file->getMimeType();
 
             if (!in_array($mime, [
                 'application/pdf',
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'application/msword',
             ])) {
                 throw ValidationException::withMessages([
                     'media' => 'Format de fichier non supporté.',

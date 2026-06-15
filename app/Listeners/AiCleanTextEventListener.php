@@ -29,8 +29,8 @@ class AiCleanTextEventListener
     {
         try{
             $response = $this->service->cleanText($event->text) ;
-            Log::info('openAI response#' , [
-                'response' => $response,
+            Log::info('OpenAI clean text completed', [
+                'resume_id' => $event->resume->id ?? null,
             ]);
 
             $aiData = $response['data'] ?? null;

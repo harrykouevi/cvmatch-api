@@ -65,7 +65,7 @@ class OpenAIResumeService
             $output = $data['output'][1]['content'][0]['text'] ?? null;
 
             if (!$output) {
-                Log::error('OpenAI returned empty output', [ 'raw' => $data, ]);
+                Log::error('OpenAI returned empty output');
                 return [
                     'success' => false,
                     'message' => 'No response from OpenAI',

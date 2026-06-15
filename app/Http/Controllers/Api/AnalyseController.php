@@ -301,6 +301,285 @@ class AnalyseController extends Controller
         }
 
 
+        // $resume = [
+        //     "full_name" => "Jean-Claude Mensah",
+
+        //     "headline" => "Senior Civil Engineer | Building Construction Manager | Structural Design & Project Management Specialist",
+
+        //     "contact" => [
+        //         "email" => "jeanclaude.mensah@gmail.com",
+        //         "phone" => "+228 90 12 34 56",
+        //         "location" => "Lome, Togo",
+        //         "linkedin" => "linkedin.com/in/jeanclaudemensah",
+        //         "portfolio" => "www.jeanclaude-mensah-engineering.com"
+        //     ],
+
+        //     "professional_summary" => "Experienced Civil and Building Engineer with more than 12 years of experience managing large-scale residential, commercial, industrial, and infrastructure construction projects. Proven expertise in structural analysis, reinforced concrete design, construction supervision, project planning, cost estimation, quality assurance, contract administration, and site management. Strong knowledge of international building standards, safety regulations, procurement processes, and multidisciplinary coordination. Successfully delivered projects exceeding $50 million in cumulative value while maintaining strict compliance with budget, schedule, and quality requirements.",
+
+        //     "skills" => [
+
+        //         "technical" => [
+        //             "Structural Engineering",
+        //             "Reinforced Concrete Design",
+        //             "Steel Structure Design",
+        //             "Building Information Modeling (BIM)",
+        //             "Construction Project Management",
+        //             "Site Supervision",
+        //             "Cost Estimation",
+        //             "Quantity Surveying",
+        //             "Geotechnical Analysis",
+        //             "Road and Infrastructure Design",
+        //             "Construction Scheduling",
+        //             "Contract Management",
+        //             "Risk Management",
+        //             "Quality Assurance",
+        //             "Quality Control",
+        //             "Technical Drawing",
+        //             "Structural Inspection",
+        //             "Material Testing",
+        //             "Procurement Management",
+        //             "Budget Planning"
+        //         ],
+
+        //         "soft" => [
+        //             "Leadership",
+        //             "Team Management",
+        //             "Problem Solving",
+        //             "Decision Making",
+        //             "Communication",
+        //             "Stakeholder Management",
+        //             "Conflict Resolution",
+        //             "Negotiation",
+        //             "Strategic Planning",
+        //             "Adaptability",
+        //             "Attention to Detail",
+        //             "Time Management"
+        //         ],
+
+        //         "tools" => [
+        //             "AutoCAD",
+        //             "Revit",
+        //             "Civil 3D",
+        //             "SAP2000",
+        //             "ETABS",
+        //             "STAAD Pro",
+        //             "MS Project",
+        //             "Primavera P6",
+        //             "SketchUp",
+        //             "ArcGIS",
+        //             "Microsoft Excel",
+        //             "Bluebeam"
+        //         ],
+
+        //         "platforms" => [
+        //             "Windows",
+        //             "Linux",
+        //             "Autodesk Construction Cloud",
+        //             "BIM 360",
+        //             "Oracle Primavera",
+        //             "Microsoft Project Server"
+        //         ]
+        //     ],
+
+        //     "professional_experience" => [
+
+        //         [
+        //             "company" => "West Africa Construction Group",
+        //             "title" => "Senior Civil Engineer / Construction Project Manager",
+        //             "location" => "Lome, Togo",
+        //             "dates" => "01/2020 - Present",
+
+        //             "description" => "Lead engineering and construction activities for large residential, commercial, and mixed-use development projects. Responsible for planning, budgeting, contractor management, quality control, and regulatory compliance.",
+
+        //             "bullets" => [
+        //                 "Managed construction projects with budgets exceeding $20 million from design phase through final delivery.",
+        //                 "Supervised multidisciplinary teams including architects, structural engineers, MEP engineers, contractors, and consultants.",
+        //                 "Implemented project control systems that reduced schedule delays by 18%.",
+        //                 "Coordinated procurement activities and negotiated supplier contracts resulting in significant cost savings.",
+        //                 "Reviewed structural calculations and technical drawings to ensure compliance with engineering standards.",
+        //                 "Conducted site inspections and quality assurance audits throughout project execution.",
+        //                 "Prepared monthly progress reports and executive presentations for stakeholders and investors.",
+        //                 "Ensured full compliance with health, safety, environmental, and regulatory requirements."
+        //             ],
+
+        //             "technologies" => [
+        //                 "AutoCAD",
+        //                 "Revit",
+        //                 "Primavera P6",
+        //                 "SAP2000",
+        //                 "ETABS",
+        //                 "BIM 360"
+        //             ],
+
+        //             "achievements" => [
+        //                 "Delivered a 25-story commercial tower 3 months ahead of schedule.",
+        //                 "Reduced project costs by 12% through optimized procurement strategies.",
+        //                 "Managed over 300 construction personnel across multiple project sites."
+        //             ]
+        //         ],
+
+        //         [
+        //             "company" => "African Infrastructure Development Corporation",
+        //             "title" => "Civil Engineer",
+        //             "location" => "Accra, Ghana",
+        //             "dates" => "06/2015 - 12/2019",
+
+        //             "description" => "Responsible for engineering design, project coordination, construction supervision, and technical review of major public infrastructure projects.",
+
+        //             "bullets" => [
+        //                 "Designed reinforced concrete structures for government facilities and transportation infrastructure.",
+        //                 "Performed structural calculations and load analysis using advanced engineering software.",
+        //                 "Prepared engineering reports, technical specifications, and construction documentation.",
+        //                 "Coordinated contractors, consultants, and government agencies throughout project execution.",
+        //                 "Conducted risk assessments and developed mitigation plans.",
+        //                 "Monitored construction progress and ensured compliance with approved designs.",
+        //                 "Participated in contract administration and variation order evaluations."
+        //             ],
+
+        //             "technologies" => [
+        //                 "AutoCAD",
+        //                 "STAAD Pro",
+        //                 "Civil 3D",
+        //                 "MS Project"
+        //             ],
+
+        //             "achievements" => [
+        //                 "Successfully delivered 15+ infrastructure projects.",
+        //                 "Improved project reporting efficiency by 25%."
+        //             ]
+        //         ],
+
+        //         [
+        //             "company" => "BuildTech Engineering Consultants",
+        //             "title" => "Junior Structural Engineer",
+        //             "location" => "Lome, Togo",
+        //             "dates" => "09/2011 - 05/2015",
+
+        //             "description" => "Supported senior engineers in structural design, drafting, site inspections, and engineering calculations.",
+
+        //             "bullets" => [
+        //                 "Prepared structural calculations for residential and commercial buildings.",
+        //                 "Created detailed engineering drawings and technical documentation.",
+        //                 "Assisted in site inspections and quality control activities.",
+        //                 "Supported material testing and construction monitoring.",
+        //                 "Collaborated with architects and project managers."
+        //             ],
+
+        //             "technologies" => [
+        //                 "AutoCAD",
+        //                 "SAP2000",
+        //                 "Excel"
+        //             ],
+
+        //             "achievements" => [
+        //                 "Contributed to more than 40 successful building projects."
+        //             ]
+        //         ]
+        //     ],
+
+        //     "education" => [
+
+        //         [
+        //             "degree" => "Master of Science in Structural Engineering",
+        //             "institution" => "Kwame Nkrumah University of Science and Technology",
+        //             "location" => "Kumasi, Ghana",
+        //             "dates" => "2013 - 2015",
+        //             "details" => "Advanced structural analysis, seismic design, finite element methods, reinforced concrete and steel structures."
+        //         ],
+
+        //         [
+        //             "degree" => "Bachelor of Science in Civil Engineering",
+        //             "institution" => "University of Lome",
+        //             "location" => "Lome, Togo",
+        //             "dates" => "2008 - 2011",
+        //             "details" => "Civil engineering fundamentals, construction management, hydraulics, transportation engineering, geotechnical engineering."
+        //         ]
+        //     ],
+
+        //     "certifications" => [
+
+        //         [
+        //             "name" => "Project Management Professional (PMP)",
+        //             "issuer" => "Project Management Institute",
+        //             "date" => "2022",
+        //             "expiration" => "2025"
+        //         ],
+
+        //         [
+        //             "name" => "Autodesk Certified Professional - Revit",
+        //             "issuer" => "Autodesk",
+        //             "date" => "2021",
+        //             "expiration" => ""
+        //         ],
+
+        //         [
+        //             "name" => "NEBOSH Construction Safety Certification",
+        //             "issuer" => "NEBOSH",
+        //             "date" => "2020",
+        //             "expiration" => ""
+        //         ]
+        //     ],
+
+        //     "projects" => [
+
+        //         [
+        //             "name" => "25-Story Commercial Tower Development",
+        //             "description" => "Managed the engineering and construction of a high-rise mixed-use commercial tower in downtown Lome.",
+        //             "technologies" => [
+        //                 "Revit",
+        //                 "SAP2000",
+        //                 "Primavera P6",
+        //                 "BIM 360"
+        //             ],
+        //             "role" => "Project Manager and Lead Civil Engineer",
+        //             "impact" => "Delivered project ahead of schedule with 12% cost savings."
+        //         ],
+
+        //         [
+        //             "name" => "Regional Highway Expansion Program",
+        //             "description" => "Oversaw design review and construction supervision for a 65-kilometer highway expansion project.",
+        //             "technologies" => [
+        //                 "Civil 3D",
+        //                 "AutoCAD",
+        //                 "MS Project"
+        //             ],
+        //             "role" => "Civil Engineer",
+        //             "impact" => "Improved transportation capacity and reduced travel time by 30%."
+        //         ],
+
+        //         [
+        //             "name" => "University Campus Development",
+        //             "description" => "Managed structural design and construction coordination for multiple academic buildings.",
+        //             "technologies" => [
+        //                 "ETABS",
+        //                 "Revit",
+        //                 "Primavera"
+        //             ],
+        //             "role" => "Senior Structural Engineer",
+        //             "impact" => "Delivered facilities serving more than 10,000 students."
+        //         ]
+        //     ],
+
+        //     "languages" => [
+
+        //         [
+        //             "language" => "French",
+        //             "level" => "Native"
+        //         ],
+
+        //         [
+        //             "language" => "English",
+        //             "level" => "Professional Working Proficiency"
+        //         ],
+
+        //         [
+        //             "language" => "Spanish",
+        //             "level" => "Basic"
+        //         ]
+        //     ],
+
+        //     "additional_sections" => "Member of the National Society of Civil Engineers. Experienced in sustainable construction practices, green building certification processes, environmental impact assessments, and public-private partnership infrastructure projects. Regular participant in international engineering conferences and construction technology workshops."
+        // ];
 
         $using_array = true;
         if($using_array == true && $analyse->created_at->gt(Carbon::create(2026, 6, 12))){

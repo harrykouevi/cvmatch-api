@@ -8,6 +8,7 @@ use App\Repositories\Interfaces\CreditPlanRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Exceptions\RepositoryException;
 use Illuminate\Support\Str;
@@ -43,11 +44,11 @@ class ProductController extends Controller
         }
         $products = $this->creditPlanRepository->scopeQuery(function ($query) {
             return $query->where('is_active', true)
-                        ->where('credits', '>', 0)
+                        // ->where('credits', '>', 0)
                         ->orderBy('price', 'asc'); ;
         })->get();
 
-
+        // Log::info([$products]) ;
         return $this->sendResponse( $products->toArray(),'plan get successfully'  );
 
     }

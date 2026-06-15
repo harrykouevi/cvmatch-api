@@ -21,8 +21,12 @@ class ProductControllerTest extends TestCase
 
             $response = $this->getJson(route('credit-plans.index'));
 
-            dd($response->json());
             $response->assertStatus(200);
+            $response->assertJsonStructure([
+                'success',
+                'data',
+                'message',
+            ]);
 
         } catch (\Exception $e) {
             Log::error('FAIL:'. $e->getMessage() , [
