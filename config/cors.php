@@ -23,7 +23,9 @@ return [
         'http://localhost:5173',
         'http://127.0.0.1:5173',
         'https://cvmatchai.us',
+        'https://staging-app.cvmatchai.us',
         'https://www.cvmatchai.us',
+        'https://www.staging-app.cvmatchai.us',
     ],
 
     'allowed_origins_patterns' => [],
