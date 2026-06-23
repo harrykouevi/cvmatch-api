@@ -578,6 +578,24 @@ class OpenAIResumeService
             If unsupported, omit it, return an empty array, or leave the field empty.
             Truthfulness is mandatory.
             ==================================================
+            KEYWORD HANDLING RULES
+            ==================================================
+            Separate supported resume evidence from unsupported job requirements.
+            keywords_added MUST contain only keywords that are clearly supported by the original resume evidence or by a conservative wording improvement of that evidence.
+            Unsupported job keywords MUST NOT be added to optimized_resume, optimized_resume_array.sections, or keywords_added.
+            Unsupported keywords from the job description must remain in missing_keywords, missing_hard_skills, remaining_weaknesses, warnings, recruiter_risk_flags, or recruiter_impression.
+            Do not force senior keywords into the optimized resume unless the original resume clearly supports them.
+            If the job description asks for IT strategy, policies and procedures, infrastructure management, cloud services, cybersecurity ownership, backup and disaster recovery, business continuity, vendor management, IT budgets, team leadership, risk management, compliance, ITIL, PMP, CISSP, CompTIA Security+, Microsoft Certified, or AWS Certified Solutions Architect, include them only when the original resume proves them.
+            Safer supported keywords may be used only when evidenced, such as IT support, computer maintenance, hardware troubleshooting, operating system installation, software installation, router configuration, network wiring, network device configuration, printer support, scanner support, user support, customer support, document control, data entry, safety standards, continuous improvement, and cybersecurity awareness.
+            ==================================================
+            ROLE-FIT RULES
+            ==================================================
+            If the target role is more senior than the resume supports, optimize toward the closest credible role and explain the gap honestly.
+            Do not inflate the candidate into a manager, director, executive, architect, strategist, owner, or compliance/security/cloud leader unless the original resume clearly supports that level.
+            Use a credible headline and positioning based on evidence, not the target job title when the fit is weak.
+            recruiter_impression must state whether the optimized resume is a strong fit, partial fit, stretch fit, or closer to a lower/similar role.
+            remaining_weaknesses must explain what the optimized resume cannot fix, including unsupported senior requirements, missing certifications, missing leadership ownership, missing budget/vendor/cloud/compliance evidence, or missing measurable achievements.
+            ==================================================
             ATS + WRITING RULES
             ==================================================
             The optimized resume must be ATS-safe and recruiter-readable.
@@ -980,6 +998,15 @@ class OpenAIResumeService
             }
             Rules: - section_key is always snake_case. - section_label is a professional PDF heading. - data contains the full structured content. - Sections are ordered in the same reading order as optimized_resume. - Include only meaningful sections. - "contact" and "professional_summary" appear only inside sections[]. - The PDF renderer reads ONLY sections[]. - optimized_resume_array is the machine-readable mirror of optimized_resume.
             ==================================================
+            FREE ANALYSIS AND UNLOCKED RESULT CONSISTENCY
+            ==================================================
+            The free analysis and unlocked result must describe the same reality.
+            original_resume fields must reflect the resume before optimization.
+            optimized_resume_analysis must reflect only improvements actually made in optimized_resume and optimized_resume_array.sections.
+            Do not make the free analysis imply unsupported improvements that the unlocked resume cannot truthfully deliver.
+            Do not let optimized_resume, optimized_resume_array.sections, cover_letter, keywords_added, recruiter_impression, remaining_weaknesses, recommendations, or warnings contradict each other.
+            If a requirement remains unsupported, keep that limitation consistently visible in missing keywords, remaining weaknesses, warnings, or recruiter impression.
+            ==================================================
             JSON OUTPUT RULES
             ==================================================
             Return ONLY valid UTF-8 JSON.
@@ -1046,7 +1073,7 @@ class OpenAIResumeService
             "warnings": []
             }
             ==================================================
-            FINAL CONSISTENCY CHECK
+            QUALITY CHECK BEFORE RETURNING JSON
             ==================================================
             Before returning JSON, verify:
             1. optimized_resume fits within 2 pages.
@@ -1061,6 +1088,10 @@ class OpenAIResumeService
             9. Every bullet, achievement, metric, technology, date, and key detail in optimized_resume
             exists in optimized_resume_array.sections.
             10. JSON is valid UTF-8 and Laravel-parsable.
+            11. keywords_added contains only supported resume evidence.
+            12. Unsupported job keywords remain in missing_keywords, missing_hard_skills, remaining_weaknesses, warnings, recruiter_risk_flags, or recruiter_impression.
+            13. Role fit is honest and does not overclaim seniority, leadership, budget, vendor, cloud, compliance, cybersecurity, or strategy ownership.
+            14. Free analysis fields and unlocked result fields are consistent.
             Resume:
             $resumeText
             Job description:

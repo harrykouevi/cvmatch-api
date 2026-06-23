@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['guest.or.auth'])->group(function () {
         Route::get('/auth/me', [AuthController::class, 'show']);
+        Route::post('/payments/stripe/session/verify', [PaymentsController::class, 'verifyStripeSession']);
         // POST /api/resumes/upload ✔️
         Route::post('/resumes/upload', [ResumeController::class, 'store'])->name('resumes.upload');
         // POST /api/analyses/create✔️
@@ -57,12 +58,6 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:api','set.tenant'])->group(function () {
     });
 });
-
-
-Route::prefix('v1')->group(function () {
-    //
-});
-
 
 
 

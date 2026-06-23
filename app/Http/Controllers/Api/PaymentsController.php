@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Api\Controller;
 use App\Mail\PaymentSuccessMail;
 use App\Models\CreditPlan;
+use App\Models\Payment;
+use App\Models\Purchase;
 use App\Models\User;
 use App\Repositories\Interfaces\CreditPlanRepository;
 use App\Repositories\Interfaces\CreditRepository;
@@ -324,6 +326,94 @@ class PaymentsController extends Controller
             "url" => $session->url
         ], __('lang.saved_successfully', ['operator' => __('lang.session_stripe')]));
 
+    }
+
+
+    public function verifyStripeSession(Request $request)
+    {
+        $this->validate($request, [
+            'session_id' => 'required|string',
+        ]);
+
+        $user = $request->attributes->get('current_user') ?: Auth::user();
+        if (!$user) {
+            return $this->sendError('User not authenticated', 401);
+        }
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        try {
+            $session = Session::retrieve($request->session_id);
+        } catch (Exception $e) {
+            Log::warning('Stripe session verification failed', [
+                'session_id' => $request->session_id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'verified' => false,
+                'status' => 'failed',
+                'message' => 'Payment not verified',
+            ], 400);
+        }
+
+        $metadataUserId = $session->metadata->user_id ?? null;
+        if (!$metadataUserId || (string) $metadataUserId !== (string) $user->id) {
+            Log::warning('Stripe session ownership mismatch', [
+                'session_id' => $session->id ?? $request->session_id,
+                'user_id' => $user->id,
+                'metadata_user_id' => $metadataUserId,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'verified' => false,
+                'status' => 'failed',
+                'message' => 'Payment not verified',
+            ], 403);
+        }
+
+        if (($session->payment_status ?? null) !== 'paid') {
+            return response()->json([
+                'success' => true,
+                'verified' => false,
+                'status' => $session->payment_status ?? $session->status ?? 'pending',
+            ]);
+        }
+
+        $paymentIntent = $session->payment_intent ?? null;
+        $payment = Payment::where('provider', 'stripe')
+            ->where(function ($query) use ($paymentIntent, $session) {
+                if ($paymentIntent) {
+                    $query->where('provider_payment_id', $paymentIntent);
+                }
+
+                $query->orWhere('meta_json->stripe_session_id', $session->id);
+            })
+            ->first();
+
+        $purchase = $payment
+            ? Purchase::where('payment_id', $payment->id)->where('user_id', $user->id)->first()
+            : null;
+
+        $planId = $session->metadata->product_id ?? $purchase?->product_id;
+        $amount = $session->amount_total ? ($session->amount_total / 100) : $payment?->amount;
+
+        return response()->json([
+            'success' => true,
+            'verified' => true,
+            'status' => 'paid',
+            'session_id' => $session->id,
+            'transaction_id' => $payment?->provider_payment_id ?? $paymentIntent,
+            'payment_id' => $payment?->id,
+            'purchase_id' => $purchase?->id,
+            'plan_id' => $planId,
+            'amount' => $amount,
+            'currency' => strtoupper($session->currency ?? $payment?->currency ?? 'usd'),
+            'local_payment_record' => (bool) $payment,
+            'local_purchase_record' => (bool) $purchase,
+        ]);
     }
 
 
