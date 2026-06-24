@@ -180,12 +180,13 @@ class AnalyseController extends Controller
             } else {
                 if (Str::isUuid($id)) {
                     $analyse = $this->analyseRepository->findWhere(['uuid'=> $id])->first();
+                    Log::info(['jjjjjjj',$analyse]) ;
                 } else {
                     return $this->sendError('Analyse not found');
                 }
             }
 
-            if (!$analyse) {
+            if (empty($analyse)) {
                 return $this->sendError('%Analyse not found');
             }
 
