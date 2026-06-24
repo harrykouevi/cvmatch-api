@@ -113,6 +113,22 @@ class User extends Authenticatable implements HasMedia
                 ->limit(5);
             },
 
+            'analyses' => function ($q) {
+
+                $q->select(
+                    'id',
+                    'uuid',
+                    'user_id',
+                    'status',
+                    'score',
+                    'is_full_unlocked',
+                    'created_at'
+                )
+                ->where('is_full_unlocked', 1)
+                ->latest()
+                ->limit(5);
+            },
+
         ])->loadCount('resumes')->loadCount('analyses');
 
     }

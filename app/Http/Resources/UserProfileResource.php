@@ -42,6 +42,10 @@ class UserProfileResource extends JsonResource
                 'transactions' => CreditTransactionResource::collection(
                     $this->creditTransactions
                 ),
+
+                'analyses' => AnalyseListResource::collection(
+                    $this->analyses
+                ),
             ];
         }
     }
