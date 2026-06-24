@@ -185,7 +185,7 @@ class AnalyseController extends Controller
                 }
             }
 
-            if (empty($analyse)) {
+            if (is_null($analyse)) {
                 return $this->sendError('%Analyse not found');
             }
 
