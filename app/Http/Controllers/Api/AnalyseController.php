@@ -186,7 +186,7 @@ class AnalyseController extends Controller
             }
 
             if (empty($analyse)) {
-                return $this->sendError('Analyse not found');
+                return $this->sendError('%Analyse not found');
             }
 
         } catch (RepositoryException $e) {

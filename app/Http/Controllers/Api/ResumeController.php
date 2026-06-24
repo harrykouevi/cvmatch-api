@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\AiCleanTextEvent;
+use PhpOffice\PhpWord\IOFactory;
 use App\Http\Controllers\Api\Controller;
 use App\Models\Resume;
 use App\Repositories\Interfaces\ResumeRepository;
@@ -174,9 +175,10 @@ class ResumeController extends Controller
 
 
 
-    private function extractText($file) :string
+    private function extractText($file): string
     {
-        $text = null;
+        $text = '';
+
         switch ($file->getMimeType()) {
 
             case 'application/pdf':
@@ -185,28 +187,62 @@ class ResumeController extends Controller
                 break;
 
             case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                $phpWord = \PhpOffice\PhpWord\IOFactory::load($file->getPathname());
+                $phpWord = IOFactory::load($file->getPathname());
 
-                $text = '';
                 foreach ($phpWord->getSections() as $section) {
                     foreach ($section->getElements() as $element) {
-                        if (method_exists($element, 'getText')) {
-                            $text .= $element->getText() . " ";
-                        }
+                        $text .= $this->extractPhpWordElementText($element);
                     }
                 }
                 break;
 
             default:
-                $text = null;
+                return '';
         }
 
+        // Nettoyage du texte
         $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8, ISO-8859-1, Windows-1252');
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $text = preg_replace('/[\x00-\x1F\x7F]/u', '', $text);
-        // nettoyer caractères cassés
-        // $text = preg_replace('/[^\x{0000}-\x{FFFF}]/u', '', $text);
+
         return trim($text);
+    }
+
+    /**
+     * Extraction récursive du texte des éléments PhpWord.
+     */
+    private function extractPhpWordElementText($element): string
+    {
+        $text = '';
+
+        // Cas simple : élément texte
+        if (method_exists($element, 'getText')) {
+            $value = $element->getText();
+
+            if (is_string($value)) {
+                $text .= $value . ' ';
+            }
+        }
+
+        // Cas des conteneurs (TextRun, Cell, Row, Table, etc.)
+        if (method_exists($element, 'getElements')) {
+            foreach ($element->getElements() as $child) {
+                $text .= $this->extractPhpWordElementText($child);
+            }
+        }
+
+        // Cas particulier des tableaux
+        if (method_exists($element, 'getRows')) {
+            foreach ($element->getRows() as $row) {
+                foreach ($row->getCells() as $cell) {
+                    foreach ($cell->getElements() as $cellElement) {
+                        $text .= $this->extractPhpWordElementText($cellElement);
+                    }
+                }
+            }
+        }
+
+        return $text;
     }
 
 }
